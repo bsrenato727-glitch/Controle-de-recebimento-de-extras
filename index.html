@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Gerenciador de Extras</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --text: #1e293b;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { background-color: var(--background); color: var(--text); margin: 0; padding: 20px; }
+
+        .container { 
+            max-width: 1100px; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        }
+
+        h2 { text-align: center; color: var(--primary); font-size: 1.8rem; margin-bottom: 30px; }
+
+        /* Formulário Elegante */
+        .card-form {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field label { font-size: 0.85rem; font-weight: 600; color: var(--secondary); }
+        .field input { 
+            padding: 10px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            transition: all 0.2s;
+        }
+        .field input:focus { border-color: var(--primary); outline: none; ring: 2px var(--primary); }
+
+        /* Botões */
+        .actions-bar { display: flex; gap: 10px; margin-bottom: 25px; }
+        button { 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: transform 0.1s, opacity 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        button:active { transform: scale(0.98); }
+        
+        .btn-save { background: var(--primary); color: white; flex: 2; }
+        .btn-print { background: var(--secondary); color: white; flex: 1; }
+
+        /* Tabela Responsiva */
+        .table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
+        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.85rem; text-transform: uppercase; color: var(--secondary); }
+        td { padding: 15px; border-top: 1px solid #f1f5f9; font-size: 0.95rem; }
+
+        /* Badges de Status */
+        .badge { 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+        }
+        .badge-pending { background: #fee2e2; color: #b91c1c; }
+        .badge-success { background: #dcfce7; color: #15803d; }
+
+        /* Total */
+        .footer-summary { 
+            margin-top: 25px; 
+            padding: 20px; 
+            background: var(--text); 
+            color: white; 
+            border-radius: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        .total-price { font-size: 1.8rem; font-weight: bold; color: #4ade80; }
+
+        /* AJUSTES PARA PDF (IMPRESSÃO) */
+        @media print {
+            @page { size: A4 landscape; margin: 1cm; }
+            body { padding: 0; background: white; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
+            .card-form, .actions-bar, .btn-row-action { display: none !important; }
+            table { width: 100%; border: 1px solid #ccc; }
+            th { background: #eee !important; color: black !important; border-bottom: 2px solid #333; }
+            td { border-bottom: 1px solid #eee; }
+            .badge { border: 1px solid #000; background: transparent !important; color: black !important; }
+        }
+
+        .btn-row-action { padding: 6px; font-size: 0.7rem; }
+        .btn-del { background: #fff1f0; color: var(--danger); }
+        .btn-ok { background: #f0fdf4; color: var(--success); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Registro de Atividades Extras</h2>
+
+    <div class="card-form">
+        <div class="field">
+            <label>📅 Data da Extra</label>
+            <input type="date" id="dataE">
+        </div>
+        <div class="field">
+            <label>🏢 Empreendimento</label>
+            <input type="text" id="emp" placeholder="Nome do Condomínio">
+        </div>
+        <div class="field">
+            <label>👤 Supervisor</label>
+            <input type="text" id="sup" placeholder="Quem autorizou">
+        </div>
+        <div class="field">
+            <label>🛠️ Função</label>
+            <input type="text" id="fun" placeholder="Serviço realizado">
+        </div>
+        <div class="field">
+            <label>💰 Valor (R$)</label>
+            <input type="number" id="val" step="0.01">
+        </div>
+        <div class="field">
+            <label>⏳ Previsão PGTO</label>
+            <input type="date" id="prev">
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <button class="btn-save" onclick="adicionar()">+ SALVAR REGISTRO</button>
+        <button class="btn-print" onclick="window.print()">📄 GERAR RELATÓRIO PDF</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Local</th>
+                    <th>Supervisor</th>
+                    <th>Função</th>
+                    <th>Previsão</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th class="btn-row-action">Ação</th>
+                </tr>
+            </thead>
+            <tbody id="lista"></tbody>
+        </table>
+    </div>
+
+    <div class="footer-summary">
+        <span>RESUMO TOTAL ACUMULADO</span>
+        <span class="total-price">R$ <span id="totalDisplay">0.00</span></span>
+    </div>
+</div>
+
+<script>
+    let dados = JSON.parse(localStorage.getItem('extras_v5')) || [];
+
+    function atualizar() {
+        localStorage.setItem('extras_v5', JSON.stringify(dados));
+        render();
+    }
+
+    function adicionar() {
+        const d = {
+            id: Date.now(),
+            dataE: document.getElementById('dataE').value,
+            emp: document.getElementById('emp').value,
+            sup: document.getElementById('sup').value,
+            fun: document.getElementById('fun').value,
+            val: parseFloat(document.getElementById('val').value) || 0,
+            prev: document.getElementById('prev').value,
+            pago: false
+        };
+
+        if(!d.dataE || d.val <= 0) return alert("Preencha Data e Valor!");
+        
+        dados.push(d);
+        atualizar();
+        document.getElementById('val').value = '';
+    }
+
+    function alternar(id) {
+        const i = dados.findIndex(x => x.id === id);
+        dados[i].pago = !dados[i].pago;
+        atualizar();
+    }
+
+    function excluir(id) {
+        if(confirm("Excluir?")) {
+            dados = dados.filter(x => x.id !== id);
+            atualizar();
+        }
+    }
+
+    function f(data) { return data ? data.split('-').reverse().join('/') : '-'; }
+
+    function render() {
+        const lista = document.getElementById('lista');
+        lista.innerHTML = '';
+        let total = 0;
+
+        dados.sort((a,b) => new Date(b.dataE) - new Date(a.dataE));
+
+        dados.forEach(item => {
+            total += item.val;
+            lista.innerHTML += `
+                <tr>
+                    <td>${f(item.dataE)}</td>
+                    <td>${item.emp}</td>
+                    <td>${item.sup}</td>
+                    <td>${item.fun}</td>
+                    <td>${f(item.prev)}</td>
+                    <td style="font-weight:600">R$ ${item.val.toFixed(2)}</td>
+                    <td>
+                        <span class="badge ${item.pago ? 'badge-success' : 'badge-pending'}">
+                            ${item.pago ? 'RECEBIDO' : 'PENDENTE'}
+                        </span>
+                    </td>
+                    <td class="btn-row-action">
+                        <button class="btn-ok" onclick="alternar(${item.id})">✔</button>
+                        <button class="btn-del" onclick="excluir(${item.id})">✖</button>
+                    </td>
+                </tr>
+            `;
+        });
+        document.getElementById('totalDisplay').innerText = total.toFixed(2);
+    }
+
+    render();
+</script>
+
+</body>
+</html>
