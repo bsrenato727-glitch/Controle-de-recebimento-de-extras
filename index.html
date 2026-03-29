@@ -29,14 +29,13 @@
 
         h2 { text-align: center; color: var(--primary); font-size: 1.8rem; margin-bottom: 30px; }
 
-        /* Formulário Elegante */
         .card-form {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             padding: 20px;
             border-radius: 12px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         }
@@ -49,9 +48,8 @@
             border-radius: 8px; 
             transition: all 0.2s;
         }
-        .field input:focus { border-color: var(--primary); outline: none; ring: 2px var(--primary); }
+        .field input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
-        /* Botões */
         .actions-bar { display: flex; gap: 10px; margin-bottom: 25px; }
         button { 
             border: none; 
@@ -67,23 +65,15 @@
         .btn-save { background: var(--primary); color: white; flex: 2; }
         .btn-print { background: var(--secondary); color: white; flex: 1; }
 
-        /* Tabela Responsiva */
         .table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
         th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.85rem; text-transform: uppercase; color: var(--secondary); }
         td { padding: 15px; border-top: 1px solid #f1f5f9; font-size: 0.95rem; }
 
-        /* Badges de Status */
-        .badge { 
-            padding: 5px 12px; 
-            border-radius: 20px; 
-            font-size: 0.75rem; 
-            font-weight: bold; 
-        }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
         .badge-pending { background: #fee2e2; color: #b91c1c; }
         .badge-success { background: #dcfce7; color: #15803d; }
 
-        /* Total */
         .footer-summary { 
             margin-top: 25px; 
             padding: 20px; 
@@ -94,23 +84,26 @@
             justify-content: space-between; 
             align-items: center;
         }
+        
+        .summary-details { display: flex; flex-direction: column; }
+        .summary-label { font-size: 0.85rem; opacity: 0.8; }
         .total-price { font-size: 1.8rem; font-weight: bold; color: #4ade80; }
+        .pending-info { font-size: 0.9rem; color: #f87171; font-weight: 500; }
 
-        /* AJUSTES PARA PDF (IMPRESSÃO) */
         @media print {
             @page { size: A4 landscape; margin: 1cm; }
             body { padding: 0; background: white; }
             .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
             .card-form, .actions-bar, .btn-row-action { display: none !important; }
             table { width: 100%; border: 1px solid #ccc; }
-            th { background: #eee !important; color: black !important; border-bottom: 2px solid #333; }
-            td { border-bottom: 1px solid #eee; }
+            th { background: #eee !important; color: black !important; }
             .badge { border: 1px solid #000; background: transparent !important; color: black !important; }
         }
 
-        .btn-row-action { padding: 6px; font-size: 0.7rem; }
-        .btn-del { background: #fff1f0; color: var(--danger); }
-        .btn-ok { background: #f0fdf4; color: var(--success); }
+        .btn-row-action { display: flex; gap: 5px; }
+        .btn-row-action button { padding: 8px; width: 35px; height: 35px; border-radius: 6px; }
+        .btn-del { background: #fee2e2; color: var(--danger); }
+        .btn-ok { background: #dcfce7; color: var(--success); }
     </style>
 </head>
 <body>
@@ -125,11 +118,11 @@
         </div>
         <div class="field">
             <label>🏢 Empreendimento</label>
-            <input type="text" id="emp" placeholder="Nome do Condomínio">
+            <input type="text" id="emp" placeholder="Condomínio">
         </div>
         <div class="field">
             <label>👤 Supervisor</label>
-            <input type="text" id="sup" placeholder="Quem autorizou">
+            <input type="text" id="sup" placeholder="Autorizado por">
         </div>
         <div class="field">
             <label>🛠️ Função</label>
@@ -161,7 +154,7 @@
                     <th>Previsão</th>
                     <th>Valor</th>
                     <th>Status</th>
-                    <th class="btn-row-action">Ação</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody id="lista"></tbody>
@@ -169,7 +162,10 @@
     </div>
 
     <div class="footer-summary">
-        <span>RESUMO TOTAL ACUMULADO</span>
+        <div class="summary-details">
+            <span class="summary-label">VALOR TOTAL RECEBIDO</span>
+            <span id="pendingText" class="pending-info">Pendente: R$ 0.00</span>
+        </div>
         <span class="total-price">R$ <span id="totalDisplay">0.00</span></span>
     </div>
 </div>
@@ -198,7 +194,11 @@
         
         dados.push(d);
         atualizar();
+        
+        // Limpar apenas campos de serviço e valor para agilizar a próxima entrada
+        document.getElementById('fun').value = '';
         document.getElementById('val').value = '';
+        document.getElementById('val').focus();
     }
 
     function alternar(id) {
@@ -208,7 +208,7 @@
     }
 
     function excluir(id) {
-        if(confirm("Excluir?")) {
+        if(confirm("Deseja excluir este registro?")) {
             dados = dados.filter(x => x.id !== id);
             atualizar();
         }
@@ -219,12 +219,19 @@
     function render() {
         const lista = document.getElementById('lista');
         lista.innerHTML = '';
-        let total = 0;
+        let totalRecebido = 0;
+        let totalPendente = 0;
 
         dados.sort((a,b) => new Date(b.dataE) - new Date(a.dataE));
 
         dados.forEach(item => {
-            total += item.val;
+            // Lógica de cálculo solicitada
+            if (item.pago) {
+                totalRecebido += item.val;
+            } else {
+                totalPendente += item.val;
+            }
+
             lista.innerHTML += `
                 <tr>
                     <td>${f(item.dataE)}</td>
@@ -238,14 +245,18 @@
                             ${item.pago ? 'RECEBIDO' : 'PENDENTE'}
                         </span>
                     </td>
-                    <td class="btn-row-action">
-                        <button class="btn-ok" onclick="alternar(${item.id})">✔</button>
-                        <button class="btn-del" onclick="excluir(${item.id})">✖</button>
+                    <td>
+                        <div class="btn-row-action">
+                            <button class="btn-ok" title="Marcar como recebido" onclick="alternar(${item.id})">✔</button>
+                            <button class="btn-del" title="Excluir" onclick="excluir(${item.id})">✖</button>
+                        </div>
                     </td>
                 </tr>
             `;
         });
-        document.getElementById('totalDisplay').innerText = total.toFixed(2);
+
+        document.getElementById('totalDisplay').innerText = totalRecebido.toFixed(2);
+        document.getElementById('pendingText').innerText = `Ainda Pendente: R$ ${totalPendente.toFixed(2)}`;
     }
 
     render();
