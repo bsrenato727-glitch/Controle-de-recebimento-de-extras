@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Gerenciador de Extras</title>
+    <title>Meu Gerenciador de Extras - Cloud</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -61,6 +62,7 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         button:active { transform: scale(0.98); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
         
         .btn-save { background: var(--primary); color: white; flex: 2; }
         .btn-print { background: var(--secondary); color: white; flex: 1; }
@@ -139,7 +141,7 @@
     </div>
 
     <div class="actions-bar">
-        <button class="btn-save" onclick="adicionar()">+ SALVAR REGISTRO</button>
+        <button id="btnSalvar" class="btn-save" onclick="adicionar()">+ SALVAR REGISTRO NO CLOUD</button>
         <button class="btn-print" onclick="window.print()">📄 GERAR RELATÓRIO PDF</button>
     </div>
 
@@ -170,62 +172,85 @@
     </div>
 </div>
 
-<script>
-    let dados = JSON.parse(localStorage.getItem('extras_v5')) || [];
+<script type="module">
+    // --- CONFIGURAÇÃO DO FIREBASE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    function atualizar() {
-        localStorage.setItem('extras_v5', JSON.stringify(dados));
-        render();
-    }
+    const firebaseConfig = {
+        apiKey: "AIzaSyDgsGwJDm4kRlpTxJ8ZOt4VjU8Iy_Ahztg",
+        authDomain: "prestadores-de-servi.firebaseapp.com",
+        projectId: "prestadores-de-servi",
+        storageBucket: "prestadores-de-servi.firebasestorage.app",
+        messagingSenderId: "1898757786612",
+        appId: "1:1898757786612:web:76ca92227286918af3db91"
+    };
 
-    function adicionar() {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Formatar data para exibição
+    function f(data) { return data ? data.split('-').reverse().join('/') : '-'; }
+
+    // ADICIONAR REGISTRO
+    window.adicionar = async function() {
+        const btn = document.getElementById('btnSalvar');
         const d = {
-            id: Date.now(),
             dataE: document.getElementById('dataE').value,
             emp: document.getElementById('emp').value,
             sup: document.getElementById('sup').value,
             fun: document.getElementById('fun').value,
             val: parseFloat(document.getElementById('val').value) || 0,
             prev: document.getElementById('prev').value,
-            pago: false
+            pago: false,
+            timestamp: new Date().getTime() // Para controle de ordem
         };
 
         if(!d.dataE || d.val <= 0) return alert("Preencha Data e Valor!");
-        
-        dados.push(d);
-        atualizar();
-        
-        // Limpar apenas campos de serviço e valor para agilizar a próxima entrada
-        document.getElementById('fun').value = '';
-        document.getElementById('val').value = '';
-        document.getElementById('val').focus();
-    }
 
-    function alternar(id) {
-        const i = dados.findIndex(x => x.id === id);
-        dados[i].pago = !dados[i].pago;
-        atualizar();
-    }
+        btn.innerText = "SALVANDO...";
+        btn.disabled = true;
 
-    function excluir(id) {
-        if(confirm("Deseja excluir este registro?")) {
-            dados = dados.filter(x => x.id !== id);
-            atualizar();
+        try {
+            await addDoc(collection(db, "trabalhos_extras"), d);
+            
+            // Limpar campos
+            document.getElementById('fun').value = '';
+            document.getElementById('val').value = '';
+            document.getElementById('val').focus();
+        } catch (e) {
+            alert("Erro ao salvar no Firebase!");
+            console.error(e);
+        } finally {
+            btn.innerText = "+ SALVAR REGISTRO NO CLOUD";
+            btn.disabled = false;
         }
     }
 
-    function f(data) { return data ? data.split('-').reverse().join('/') : '-'; }
+    // ALTERNAR STATUS (PAGO / PENDENTE)
+    window.alternar = async function(id, statusAtual) {
+        const docRef = doc(db, "trabalhos_extras", id);
+        await updateDoc(docRef, { pago: !statusAtual });
+    }
 
-    function render() {
+    // EXCLUIR REGISTRO
+    window.excluir = async function(id) {
+        if(confirm("Deseja excluir este registro permanentemente?")) {
+            await deleteDoc(doc(db, "trabalhos_extras", id));
+        }
+    }
+
+    // LISTAGEM EM TEMPO REAL (onSnapshot)
+    onSnapshot(query(collection(db, "trabalhos_extras"), orderBy("dataE", "desc")), (snapshot) => {
         const lista = document.getElementById('lista');
         lista.innerHTML = '';
         let totalRecebido = 0;
         let totalPendente = 0;
 
-        dados.sort((a,b) => new Date(b.dataE) - new Date(a.dataE));
+        snapshot.forEach((doc) => {
+            const item = doc.data();
+            const id = doc.id;
 
-        dados.forEach(item => {
-            // Lógica de cálculo solicitada
             if (item.pago) {
                 totalRecebido += item.val;
             } else {
@@ -247,8 +272,8 @@
                     </td>
                     <td>
                         <div class="btn-row-action">
-                            <button class="btn-ok" title="Marcar como recebido" onclick="alternar(${item.id})">✔</button>
-                            <button class="btn-del" title="Excluir" onclick="excluir(${item.id})">✖</button>
+                            <button class="btn-ok" title="Alternar Status" onclick="alternar('${id}', ${item.pago})">✔</button>
+                            <button class="btn-del" title="Excluir" onclick="excluir('${id}')">✖</button>
                         </div>
                     </td>
                 </tr>
@@ -257,9 +282,7 @@
 
         document.getElementById('totalDisplay').innerText = totalRecebido.toFixed(2);
         document.getElementById('pendingText').innerText = `Ainda Pendente: R$ ${totalPendente.toFixed(2)}`;
-    }
-
-    render();
+    });
 </script>
 
 </body>
