@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Gerenciador de Extras - Cloud</title>
+    <title>Gerenciador de Extras - Cloud</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
@@ -49,7 +49,6 @@
             border-radius: 8px; 
             transition: all 0.2s;
         }
-        .field input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
         .actions-bar { display: flex; gap: 10px; margin-bottom: 25px; }
         button { 
@@ -58,19 +57,16 @@
             border-radius: 8px; 
             font-weight: bold; 
             cursor: pointer; 
-            transition: transform 0.1s, opacity 0.2s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        button:active { transform: scale(0.98); }
-        button:disabled { background: #ccc; cursor: not-allowed; }
         
         .btn-save { background: var(--primary); color: white; flex: 2; }
         .btn-print { background: var(--secondary); color: white; flex: 1; }
 
         .table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
-        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.85rem; text-transform: uppercase; color: var(--secondary); }
-        td { padding: 15px; border-top: 1px solid #f1f5f9; font-size: 0.95rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.85rem; color: var(--secondary); }
+        td { padding: 15px; border-top: 1px solid #f1f5f9; }
 
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
         .badge-pending { background: #fee2e2; color: #b91c1c; }
@@ -87,15 +83,11 @@
             align-items: center;
         }
         
-        .summary-details { display: flex; flex-direction: column; }
-        .summary-label { font-size: 0.85rem; opacity: 0.8; }
         .total-price { font-size: 1.8rem; font-weight: bold; color: #4ade80; }
-        .pending-info { font-size: 0.9rem; color: #f87171; font-weight: 500; }
 
         .btn-row-action { display: flex; gap: 5px; }
-        .btn-row-action button { padding: 8px; width: 35px; height: 35px; border-radius: 6px; }
-        .btn-del { background: #fee2e2; color: var(--danger); }
-        .btn-ok { background: #dcfce7; color: var(--success); }
+        .btn-del { background: #fee2e2; color: var(--danger); padding: 8px; border-radius: 6px; }
+        .btn-ok { background: #dcfce7; color: var(--success); padding: 8px; border-radius: 6px; }
 
         @media print {
             .card-form, .actions-bar, .btn-row-action { display: none !important; }
@@ -108,34 +100,16 @@
     <h2>Registro de Atividades Extras</h2>
 
     <div class="card-form">
-        <div class="field">
-            <label>📅 Data da Extra</label>
-            <input type="date" id="dataE">
-        </div>
-        <div class="field">
-            <label>🏢 Empreendimento</label>
-            <input type="text" id="emp" placeholder="Condomínio">
-        </div>
-        <div class="field">
-            <label>👤 Supervisor</label>
-            <input type="text" id="sup" placeholder="Autorizado por">
-        </div>
-        <div class="field">
-            <label>🛠️ Função</label>
-            <input type="text" id="fun" placeholder="Serviço realizado">
-        </div>
-        <div class="field">
-            <label>💰 Valor (R$)</label>
-            <input type="number" id="val" step="0.01">
-        </div>
-        <div class="field">
-            <label>⏳ Previsão PGTO</label>
-            <input type="date" id="prev">
-        </div>
+        <div class="field"><label>📅 Data</label><input type="date" id="dataE"></div>
+        <div class="field"><label>🏢 Local</label><input type="text" id="emp" placeholder="Empreendimento"></div>
+        <div class="field"><label>👤 Supervisor</label><input type="text" id="sup" placeholder="Nome"></div>
+        <div class="field"><label>🛠️ Função</label><input type="text" id="fun"></div>
+        <div class="field"><label>💰 Valor</label><input type="number" id="val" step="0.01"></div>
+        <div class="field"><label>⏳ Previsão</label><input type="date" id="prev"></div>
     </div>
 
     <div class="actions-bar">
-        <button id="btnSalvar" class="btn-save" onclick="adicionar()">+ SALVAR REGISTRO NO CLOUD</button>
+        <button id="btnSalvar" class="btn-save" onclick="adicionar()">+ SALVAR REGISTRO NO EXTRAS</button>
         <button class="btn-print" onclick="window.print()">📄 GERAR RELATÓRIO PDF</button>
     </div>
 
@@ -143,14 +117,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Data</th>
-                    <th>Local</th>
-                    <th>Supervisor</th>
-                    <th>Função</th>
-                    <th>Previsão</th>
-                    <th>Valor</th>
-                    <th>Status</th>
-                    <th>Ação</th>
+                    <th>Data</th><th>Local</th><th>Supervisor</th><th>Função</th><th>Previsão</th><th>Valor</th><th>Status</th><th>Ações</th>
                 </tr>
             </thead>
             <tbody id="lista"></tbody>
@@ -158,9 +125,9 @@
     </div>
 
     <div class="footer-summary">
-        <div class="summary-details">
-            <span class="summary-label">VALOR TOTAL RECEBIDO</span>
-            <span id="pendingText" class="pending-info">Pendente: R$ 0.00</span>
+        <div>
+            <span style="font-size: 0.8rem; opacity: 0.7;">VALOR TOTAL RECEBIDO</span><br>
+            <span id="pendingText" style="color: #f87171; font-size: 0.9rem;">Pendente: R$ 0.00</span>
         </div>
         <span class="total-price">R$ <span id="totalDisplay">0.00</span></span>
     </div>
@@ -170,21 +137,20 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // --- CONFIGURAÇÃO DO FIREBASE (PROJETO EXTRAS) ---
+    // CONFIGURAÇÃO DO FIREBASE (PROJETO EXTRAS)
     const firebaseConfig = {
-      apiKey: "AIzaSyDgsGwJDm4kRlpTxJ8ZOt4VjU8iy_Ahztg",
-      authDomain: "prestadores-de-servi.firebaseapp.com",
-      projectId: "prestadores-de-servi",
-      storageBucket: "prestadores-de-servi.firebasestorage.app",
-      messagingSenderId: "1098757756612",
-      appId: "1:1098757756612:web:325755a71d0769bbf3db91",
-      measurementId: "G-N1F9EM60JT"
+      apiKey: "AIzaSyC1am_JtUQrkoMdBmfv6JDWvLzQBuLrvps",
+      authDomain: "extras-13c06.firebaseapp.com",
+      projectId: "extras-13c06",
+      storageBucket: "extras-13c06.firebasestorage.app",
+      messagingSenderId: "634892180874",
+      appId: "1:634892180874:web:51a459c181dede8f5ebc73"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    function f(data) { return data ? data.split('-').reverse().join('/') : '-'; }
+    const formatarData = (d) => d ? d.split('-').reverse().join('/') : '-';
 
     // Salvar Registro
     window.adicionar = async function() {
@@ -202,78 +168,54 @@
 
         if(!d.dataE || d.val <= 0) return alert("Preencha Data e Valor!");
 
-        btn.innerText = "SALVANDO...";
         btn.disabled = true;
-
         try {
             await addDoc(collection(db, "trabalhos_extras"), d);
             document.getElementById('fun').value = '';
             document.getElementById('val').value = '';
-            document.getElementById('val').focus();
         } catch (e) {
-            alert("Erro ao salvar! Verifique as regras de segurança no Firebase.");
-            console.error(e);
+            alert("Erro ao salvar! Verifique as regras no Firebase.");
         } finally {
-            btn.innerText = "+ SALVAR REGISTRO NO CLOUD";
             btn.disabled = false;
         }
     }
 
-    // Mudar Status (Recebido / Pendente)
-    window.alternar = async function(id, statusAtual) {
-        const docRef = doc(db, "trabalhos_extras", id);
-        await updateDoc(docRef, { pago: !statusAtual });
-    }
+    // Alternar Status
+    window.alternar = async (id, status) => await updateDoc(doc(db, "trabalhos_extras", id), { pago: !status });
 
     // Excluir
-    window.excluir = async function(id) {
-        if(confirm("Deseja excluir este registro permanentemente?")) {
-            await deleteDoc(doc(db, "trabalhos_extras", id));
-        }
-    }
+    window.excluir = async (id) => confirm("Excluir permanentemente?") && await deleteDoc(doc(db, "trabalhos_extras", id));
 
-    // Listagem em Tempo Real e Cálculos
-    onSnapshot(query(collection(db, "trabalhos_extras"), orderBy("dataE", "desc")), (snapshot) => {
+    // Monitorar Dados
+    onSnapshot(query(collection(db, "trabalhos_extras"), orderBy("dataE", "desc")), (snap) => {
         const lista = document.getElementById('lista');
         lista.innerHTML = '';
-        let totalRecebido = 0;
-        let totalPendente = 0;
+        let recebido = 0, pendente = 0;
 
-        snapshot.forEach((doc) => {
+        snap.forEach((doc) => {
             const item = doc.data();
             const id = doc.id;
-
-            if (item.pago) { 
-                totalRecebido += item.val; 
-            } else { 
-                totalPendente += item.val; 
-            }
+            item.pago ? recebido += item.val : pendente += item.val;
 
             lista.innerHTML += `
                 <tr>
-                    <td>${f(item.dataE)}</td>
+                    <td>${formatarData(item.dataE)}</td>
                     <td>${item.emp}</td>
                     <td>${item.sup}</td>
                     <td>${item.fun}</td>
-                    <td>${f(item.prev)}</td>
+                    <td>${formatarData(item.prev)}</td>
                     <td style="font-weight:600">R$ ${item.val.toFixed(2)}</td>
-                    <td>
-                        <span class="badge ${item.pago ? 'badge-success' : 'badge-pending'}">
-                            ${item.pago ? 'RECEBIDO' : 'PENDENTE'}
-                        </span>
-                    </td>
+                    <td><span class="badge ${item.pago ? 'badge-success' : 'badge-pending'}">${item.pago ? 'OK' : 'PENDENTE'}</span></td>
                     <td>
                         <div class="btn-row-action">
                             <button class="btn-ok" onclick="alternar('${id}', ${item.pago})">✔</button>
                             <button class="btn-del" onclick="excluir('${id}')">✖</button>
                         </div>
                     </td>
-                </tr>
-            `;
+                </tr>`;
         });
-
-        document.getElementById('totalDisplay').innerText = totalRecebido.toFixed(2);
-        document.getElementById('pendingText').innerText = `Ainda Pendente: R$ ${totalPendente.toFixed(2)}`;
+        document.getElementById('totalDisplay').innerText = recebido.toFixed(2);
+        document.getElementById('pendingText').innerText = `Pendente: R$ ${pendente.toFixed(2)}`;
     });
 </script>
 
