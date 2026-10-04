@@ -292,6 +292,88 @@
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
         @keyframes rowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .row-anim { animation: rowIn 0.25s ease-out both; }
+/* Área de condomínios */
+#modalCondominios .modal { max-width: 820px; }
+.condo-form { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.condo-form .wide, .condo-form-actions { grid-column:1/-1; }
+.condo-form input,.condo-form textarea,.condo-search input {
+    width:100%; padding:10px 12px; border:1.5px solid var(--border);
+    border-radius:8px; font:inherit; color:var(--text); background:var(--input-bg);
+}
+.condo-form textarea { min-height:72px; resize:vertical; }
+.condo-form input:focus,.condo-form textarea:focus,.condo-search input:focus {
+    outline:none; border-color:var(--primary); background:white;
+}
+.condo-form-actions,.condo-item-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.condo-action-btn {
+    border:0; border-radius:8px; padding:9px 12px; background:var(--primary);
+    color:white; font-family:inherit; font-weight:700; font-size:.84rem; cursor:pointer;
+}
+.condo-action-btn.secondary { background:#e2e8f0; color:var(--text); }
+.condo-list { display:grid; gap:9px; max-height:280px; overflow:auto; }
+.condo-item {
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:12px; border:1px solid var(--border); border-radius:10px;
+    background:var(--input-bg);
+}
+.condo-item strong,.condo-item small { display:block; }
+.condo-item small { margin-top:4px; color:var(--text-muted); }
+.condo-detail-top {
+    display:flex; justify-content:space-between; align-items:center;
+    gap:10px; margin-bottom:14px;
+}
+.condo-facts { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin:12px 0; }
+.condo-fact { padding:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:9px; }
+.condo-fact span { display:block; color:var(--text-muted); font-size:.72rem; }
+.condo-fact strong { display:block; margin-top:4px; font-size:.94rem; }
+.condo-notes {
+    padding:12px; margin-top:9px; background:var(--input-bg);
+    border-radius:9px; white-space:pre-wrap; font-size:.86rem;
+}
+.condo-history { overflow-x:auto; margin-top:12px; }
+.condo-history table { min-width:560px; }
+.condo-search { margin-bottom:10px; }
+
+@media(max-width:600px) {
+    .condo-form { grid-template-columns:1fr 1fr; }
+    .condo-facts { grid-template-columns:1fr 1fr; }
+    .condo-item { align-items:flex-start; flex-direction:column; }
+}
+.condo-tabs { display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; }
+.condo-tab-btn {
+    padding:9px 12px; border:1px solid var(--border); border-radius:8px;
+    background:#f8fafc; color:var(--text); font:600 .82rem inherit; cursor:pointer; white-space:nowrap;
+}
+.condo-tab-btn.active { background:var(--primary); border-color:var(--primary); color:white; }
+.condo-tab-panel { display:none; }
+.condo-tab-panel.active { display:block; }
+.condo-form input[type="number"], .condo-form input[type="text"], .condo-form textarea, .condo-form select {
+    width:100%; padding:10px 12px; border:1.5px solid var(--border);
+    border-radius:8px; font:inherit; color:var(--text); background:var(--input-bg);
+}
+.condo-form textarea { min-height:72px; resize:vertical; }
+.condo-choices { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+.condo-choice {
+    display:inline-flex; align-items:center; gap:7px; padding:7px 10px;
+    border:1px solid var(--border); border-radius:8px; cursor:pointer; background:#fff;
+}
+.condo-choice input[type="radio"] {
+    appearance:none; width:18px; height:18px; border:2px solid #94a3b8;
+    border-radius:4px; display:inline-grid; place-content:center; margin:0;
+}
+.condo-choice input[type="radio"]:checked { background:var(--primary); border-color:var(--primary); }
+.condo-choice input[type="radio"]:checked::after { content:"✓"; color:white; font-size:13px; font-weight:800; }
+.tower-card { border:1px solid var(--border); background:var(--input-bg); border-radius:10px; padding:12px; margin:10px 0; }
+.tower-fields { display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; }
+.tower-total { margin-top:9px; font-weight:700; color:var(--success); }
+.condo-summary-total { padding:11px; margin:10px 0; background:var(--primary-light); border-radius:8px; font-weight:800; }
+.condo-section-title { margin:14px 0 5px; font-weight:700; font-size:.85rem; }
+.condo-small-btn { margin-top:8px; padding:8px 11px; border:0; border-radius:8px; background:#e2e8f0; font:600 .82rem inherit; cursor:pointer; }
+.zelador-list { display:grid; gap:8px; margin-top:8px; }
+@media(max-width:600px) {
+    .tower-fields { grid-template-columns:1fr 1fr; }
+    .tower-fields .tower-name { grid-column:1/-1; }
+}
 
         @media (max-width: 900px) { .card-form { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 700px) {
@@ -325,7 +407,88 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-    </style>
+    
+/* Ajustes visuais e de toque para o cadastro de condomínios */
+#modalCondominios .modal { max-width: 900px; max-height: 92vh; }
+#modalCondominios .modal-body { padding: 18px 20px 22px; }
+#modalCondominios .condo-form { display: block; }
+#modalCondominios .condo-tabs {
+    display: flex; gap: 8px; margin: 0 0 18px; padding: 4px;
+    overflow-x: auto; border: 1px solid var(--border); border-radius: 12px;
+    background: #f8fafc; -webkit-overflow-scrolling: touch;
+}
+#modalCondominios .condo-tab-btn {
+    flex: 1 0 auto; min-height: 44px; padding: 10px 14px;
+    border: 1px solid transparent; border-radius: 9px;
+    background: transparent; color: var(--text-muted);
+    font: 600 .84rem 'Inter', system-ui, sans-serif; cursor: pointer;
+    white-space: nowrap; transition: .18s ease;
+}
+#modalCondominios .condo-tab-btn:hover { background: #eaf1ff; color: var(--primary); }
+#modalCondominios .condo-tab-btn.active {
+    background: var(--primary); border-color: var(--primary); color: #fff;
+    box-shadow: 0 3px 8px rgba(29,78,216,.2);
+}
+#modalCondominios .condo-tab-panel { display: none; }
+#modalCondominios .condo-tab-panel.active {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start; gap: 14px; padding: 2px 1px 6px;
+}
+#modalCondominios #abaGeral .field.wide { grid-column: 1 / -1; }
+#modalCondominios .condo-section-title,
+#modalCondominios .condo-choices { grid-column: 1 / -1; }
+#modalCondominios .condo-section-title {
+    margin: 7px 0 -7px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    color: var(--text); font-size: .88rem;
+}
+#modalCondominios .condo-choices { gap: 9px; margin: 0 0 4px; }
+#modalCondominios .condo-choice {
+    min-height: 42px; padding: 9px 13px; border-radius: 10px;
+    background: #fff; font-size: .88rem; transition: .16s ease;
+}
+#modalCondominios .condo-choice:has(input:checked) {
+    border-color: #93c5fd; background: #eff6ff; color: #1e40af;
+}
+#modalCondominios .condo-choice input[type="radio"],
+#modalCondominios .condo-choice input[type="checkbox"] {
+    width: 18px; height: 18px; min-width: 18px; padding: 0; margin: 0;
+    border-radius: 5px; flex: 0 0 18px; accent-color: var(--primary);
+}
+#modalCondominios .condo-choice input[type="checkbox"] { appearance: auto; }
+#modalCondominios .condo-form-actions {
+    display: flex; gap: 10px; margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+#modalCondominios .condo-form-actions .condo-action-btn {
+    min-height: 44px; flex: 1; font-size: .88rem;
+}
+#modalCondominios .condo-form-actions .secondary { background: #f1f5f9; }
+#modalCondominios .tower-card { padding: 14px; background: #f8fafc; }
+#modalCondominios .condo-summary-total { color: #1e40af; }
+@media(max-width:600px) {
+    #modalCondominios .modal { max-height: 94vh; }
+    #modalCondominios .modal-body { padding: 14px; }
+    #modalCondominios .condo-tab-btn { padding: 9px 11px; font-size: .78rem; }
+    #modalCondominios .condo-tab-panel.active { grid-template-columns: 1fr; gap: 12px; }
+    #modalCondominios #abaGeral .field.wide,
+    #modalCondominios .condo-section-title,
+    #modalCondominios .condo-choices { grid-column: 1; }
+    #modalCondominios .condo-choices { display: grid; grid-template-columns: 1fr 1fr; }
+    #modalCondominios .condo-choice { justify-content: flex-start; }
+    #modalCondominios .condo-form-actions { position: sticky; bottom: -14px; background: #fff; padding: 12px 0 2px; }
+}
+
+
+#modalCondominios .adm-contact-fields {
+    display: none; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px; margin-top: 10px;
+}
+#modalCondominios .adm-contact-fields.visible { display: grid; }
+@media(max-width:600px) {
+    #modalCondominios .adm-contact-fields { grid-template-columns: 1fr; }
+}
+
+</style>
 </head>
 <body>
 
@@ -339,6 +502,7 @@
         </div>
         <div class="header-actions">
             <button class="btn-icon" onclick="abrirModalSupervisores()">👥 Gerenciar Supervisores</button>
+            <button class="btn-icon" onclick="abrirModalCondominios()">🏢 Condomínios</button>
         </div>
     </div>
 
@@ -417,10 +581,158 @@
         </div>
     </div>
 </div>
+<div class="modal-overlay" id="modalCondominios">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Condomínios cadastrados</h3>
+      <button class="modal-close" onclick="fecharModalCondominios()" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div id="condoManagerView">
+<form class="condo-form" onsubmit="event.preventDefault(); salvarCondominio();">
+  <div class="condo-tabs">
+    <button class="condo-tab-btn active" type="button" onclick="abrirAbaCondominio('abaGeral', this)">Dados e torres</button>
+    <button class="condo-tab-btn" type="button" onclick="abrirAbaCondominio('abaSeguranca', this)">Portaria e segurança</button>
+    <button class="condo-tab-btn" type="button" onclick="abrirAbaCondominio('abaLimpeza', this)">Dias de limpeza</button>
+  </div>
+
+  <div class="condo-tab-panel active" id="abaGeral">
+    <div class="field wide">
+      <label for="condNome">Nome do condomínio *</label>
+      <input id="condNome" maxlength="120" placeholder="Ex.: Terraço dos Bosques" required>
+    </div>
+
+    <div class="field">
+      <label for="condPortarias">Portarias</label>
+      <input id="condPortarias" type="number" min="0" step="1">
+    </div>
+    <div class="field">
+      <label for="condPorteiros">Porteiros</label>
+      <input id="condPorteiros" type="number" min="0" step="1">
+    </div>
+    <div class="field">
+      <label for="condZeladores">Quantidade de zeladores</label>
+      <input id="condZeladores" type="number" min="0" step="1" value="0">
+    </div>
+
+    <div class="field wide">
+      <label>Nomes dos zeladores</label>
+      <div id="nomesZeladores" class="zelador-list"></div>
+    </div>
+
+    <div class="field wide">
+      <label>O condomínio tem ADM?</label>
+      <div class="condo-choices">
+        <label class="condo-choice"><input type="radio" name="temAdm" value="sim"> Sim</label>
+        <label class="condo-choice"><input type="radio" name="temAdm" value="nao"> Não</label>
+      </div>
+      <div id="admContactFields" class="adm-contact-fields">
+        <div class="field">
+          <label for="condAdmNome">Nome do ADM</label>
+          <input id="condAdmNome" type="text" maxlength="120" placeholder="Nome do administrador">
+        </div>
+        <div class="field">
+          <label for="condAdmWhatsapp">WhatsApp do ADM</label>
+          <input id="condAdmWhatsapp" type="tel" inputmode="tel" placeholder="DDD + número">
+        </div>
+      </div>
+    </div>
+
+    <div class="field wide">
+      <label>Torres</label>
+      <div id="listaTorres"></div>
+      <button class="condo-small-btn" type="button" onclick="adicionarTorre()">＋ Adicionar torre</button>
+      <div class="condo-summary-total">Total de apartamentos: <span id="totalAptCondominio">0</span></div>
+    </div>
+
+    <div class="field wide">
+      <label for="condRotina">Rotina de extras / informações recorrentes</label>
+      <textarea id="condRotina" placeholder="Ex.: toda sexta enviam um extra para ajudar na limpeza"></textarea>
+    </div>
+    <div class="field wide">
+      <label for="condObs">Observações</label>
+      <textarea id="condObs" placeholder="Características e outras informações úteis"></textarea>
+    </div>
+    <div class="field wide">
+      <label for="condAliases">Outros nomes usados nos registros antigos (um por linha, opcional)</label>
+      <textarea id="condAliases" placeholder="Ajuda a reunir variações do nome do local"></textarea>
+    </div>
+  </div>
+
+  <div class="condo-tab-panel" id="abaSeguranca">
+    <div class="condo-section-title">Sistema Severino</div>
+    <div class="condo-choices">
+      <label class="condo-choice"><input type="radio" name="severino" value="sim"> Sim</label>
+      <label class="condo-choice"><input type="radio" name="severino" value="nao"> Não</label>
+    </div>
+
+    <div class="condo-section-title">Protocolos</div>
+    <div class="condo-choices">
+      <label class="condo-choice"><input type="radio" name="protocolo" value="manual"> Manual</label>
+      <label class="condo-choice"><input type="radio" name="protocolo" value="digital"> Digital</label>
+    </div>
+
+    <div class="condo-section-title">Reconhecimento facial</div>
+    <div class="condo-choices">
+      <label class="condo-choice"><input type="radio" name="facial" value="sim"> Sim</label>
+      <label class="condo-choice"><input type="radio" name="facial" value="nao"> Não</label>
+    </div>
+
+    <div class="condo-section-title">Abertura por leitura de placa</div>
+    <div class="condo-choices">
+      <label class="condo-choice"><input type="radio" name="placa" value="sim"> Sim</label>
+      <label class="condo-choice"><input type="radio" name="placa" value="nao"> Não</label>
+    </div>
+
+    <div class="condo-section-title">Portaria virtual/remota</div>
+    <div class="condo-choices">
+      <label class="condo-choice"><input type="radio" name="portariaVirtual" value="sim"> Sim</label>
+      <label class="condo-choice"><input type="radio" name="portariaVirtual" value="nao"> Não</label>
+    </div>
+
+    <div class="condo-section-title">Portaria com funcionário no local</div>
+    <div class="condo-choices">
+      <label class="condo-choice"><input type="radio" name="portariaHumana" value="sim"> Sim</label>
+      <label class="condo-choice"><input type="radio" name="portariaHumana" value="nao"> Não</label>
+    </div>
+  </div>
+
+  <div class="condo-tab-panel" id="abaLimpeza">
+    <div class="condo-section-title">Marque os dias em que há limpeza</div>
+    <div class="condo-choices">
+      <label class="condo-choice"><input type="checkbox" name="diasLimpeza" value="Segunda"> Segunda</label>
+      <label class="condo-choice"><input type="checkbox" name="diasLimpeza" value="Terça"> Terça</label>
+      <label class="condo-choice"><input type="checkbox" name="diasLimpeza" value="Quarta"> Quarta</label>
+      <label class="condo-choice"><input type="checkbox" name="diasLimpeza" value="Quinta"> Quinta</label>
+      <label class="condo-choice"><input type="checkbox" name="diasLimpeza" value="Sexta"> Sexta</label>
+      <label class="condo-choice"><input type="checkbox" name="diasLimpeza" value="Sábado"> Sábado</label>
+      <label class="condo-choice"><input type="checkbox" name="diasLimpeza" value="Domingo"> Domingo</label>
+    </div>
+  </div>
+
+  <div class="condo-form-actions">
+    <button class="condo-action-btn" id="btnSalvarCondominio" type="submit">Salvar condomínio</button>
+    <button class="condo-action-btn secondary" type="button" onclick="limparFormCondominio()">Limpar</button>
+  </div>
+</form>
+
+
+        <div class="sup-divider">Seus condomínios</div>
+        <div class="condo-search">
+          <input id="condBusca" type="search" placeholder="Buscar condomínio..." oninput="renderizarListaCondominios()">
+        </div>
+        <div class="condo-list" id="condoLista"></div>
+      </div>
+
+      <div id="condoDetailView" style="display:none"></div>
+    </div>
+  </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC1am_JtUQrkoMdBmfv6JDWvLzQBuLrvps",
@@ -461,11 +773,43 @@
 
     const MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-    /* LOCALSTORAGE */
-    const getSupervisores = () => JSON.parse(localStorage.getItem('extras_supervisores') || '[]');
-    const setSupervisores = (s) => localStorage.setItem('extras_supervisores', JSON.stringify(s));
+    /* SUPERVISORES: Firestore é a fonte principal; localStorage fica como cache de segurança */
+    function lerCacheSupervisores() {
+        try { return JSON.parse(localStorage.getItem('extras_supervisores') || '[]'); }
+        catch { return []; }
+    }
+    let supervisoresMemo = lerCacheSupervisores();
+    let migracaoSupervisoresTentada = false;
+    const getSupervisores = () => supervisoresMemo;
+    function guardarCacheSupervisores(lista) {
+        try { localStorage.setItem('extras_supervisores', JSON.stringify(lista)); }
+        catch (e) { console.warn('Não foi possível atualizar o cache local dos supervisores.'); }
+    }
     const getLocais = () => JSON.parse(localStorage.getItem('extras_locais') || '[]');
     const setLocais = (l) => localStorage.setItem('extras_locais', JSON.stringify(l));
+    let condominiosMemo = [];
+let editandoCondominioId = null;
+let condominioSelecionadoId = null;
+
+function normalizarNomeLocal(valor) {
+    return (valor || '').toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase();
+}
+
+function escaparHTML(valor) {
+    return (valor ?? '').toString().replace(/[&<>"']/g, caractere => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[caractere]));
+}
+
 
     /* TOAST */
     window.toast = function(msg, tipo = 'success') {
@@ -493,38 +837,51 @@
         if (sups.length === 0) { lista.innerHTML = `<div class="empty-state"><div class="empty-state-icon">👤</div>Nenhum supervisor cadastrado ainda.</div>`; return; }
         lista.innerHTML = sups.map(s => `
             <div class="sup-item">
-                <div class="sup-info"><span class="sup-name">${s.nome}</span><span class="sup-phone">${formatarTelefone(s.whatsapp)}</span></div>
+                <div class="sup-info"><span class="sup-name">${escaparHTML(s.nome)}</span><span class="sup-phone">${formatarTelefone(s.whatsapp)}</span></div>
                 <div class="sup-actions">
-                    <button class="sup-btn sup-btn-edit" onclick="editarSupervisor('${s.id}')">✎</button>
-                    <button class="sup-btn sup-btn-del" onclick="excluirSupervisor('${s.id}')">✕</button>
+                    <button class="sup-btn sup-btn-edit" onclick="editarSupervisor('${escaparHTML(s.id)}')">✎</button>
+                    <button class="sup-btn sup-btn-del" onclick="excluirSupervisor('${escaparHTML(s.id)}')">✕</button>
                 </div>
             </div>`).join('');
     }
 
-    window.salvarSupervisor = function() {
+    window.salvarSupervisor = async function() {
         const nome = document.getElementById('supNome').value.trim();
         const wppRaw = document.getElementById('supWpp').value.trim();
         const wpp = normalizarWhatsapp(wppRaw);
         if (!nome) return toast('Informe o nome do supervisor', 'error');
         if (wpp.length < 10 || wpp.length > 11) return toast('WhatsApp precisa ter DDD + numero (10 ou 11 digitos). Ex: 11999999999', 'error');
-        let sups = getSupervisores();
-        if (editandoSupId) {
-            sups = sups.map(s => s.id === editandoSupId ? { ...s, nome, whatsapp: wpp } : s);
+
+        const duplicado = getSupervisores().some(s =>
+            s.id !== editandoSupId && s.nome.toLowerCase() === nome.toLowerCase()
+        );
+        if (duplicado) return toast('Ja existe um supervisor com esse nome', 'error');
+
+        const idAtual = editandoSupId;
+        const botao = document.getElementById('btnAddSup');
+        botao.disabled = true;
+        try {
+            if (idAtual) {
+                await updateDoc(doc(db, 'supervisores', idAtual), {
+                    nome, whatsapp: wpp, atualizadoEm: Date.now()
+                });
+            } else {
+                await addDoc(collection(db, 'supervisores'), {
+                    nome, whatsapp: wpp, criadoEm: Date.now()
+                });
+            }
+
             editandoSupId = null;
-            document.getElementById('btnAddSup').textContent = 'Adicionar Supervisor';
-            toast('Supervisor atualizado!');
-        } else {
-            if (sups.some(s => s.nome.toLowerCase() === nome.toLowerCase())) return toast('Ja existe um supervisor com esse nome', 'error');
-            sups.push({ id: Date.now().toString(), nome, whatsapp: wpp });
-            toast('Supervisor adicionado!');
+            botao.textContent = 'Adicionar Supervisor';
+            document.getElementById('supNome').value = '';
+            document.getElementById('supWpp').value = '';
+            document.getElementById('wppPreview').classList.remove('visible');
+            toast(idAtual ? 'Supervisor atualizado!' : 'Supervisor salvo no Firestore!');
+        } catch (e) {
+            toast('Não foi possível salvar no Firestore. Confira as regras da coleção supervisores; seu cache local foi mantido.', 'error');
+        } finally {
+            botao.disabled = false;
         }
-        setSupervisores(sups);
-        atualizarDatalistSupervisores();
-        renderizarSupervisores();
-        document.getElementById('supNome').value = '';
-        document.getElementById('supWpp').value = '';
-        document.getElementById('wppPreview').classList.remove('visible');
-        document.getElementById('supNome').focus();
     }
 
     window.editarSupervisor = function(id) {
@@ -538,12 +895,14 @@
         atualizarPreviewWhatsapp(sup.whatsapp);
     }
 
-    window.excluirSupervisor = function(id) {
+    window.excluirSupervisor = async function(id) {
         if (!confirm('Excluir este supervisor?')) return;
-        setSupervisores(getSupervisores().filter(s => s.id !== id));
-        atualizarDatalistSupervisores();
-        renderizarSupervisores();
-        toast('Supervisor removido', 'info');
+        try {
+            await deleteDoc(doc(db, 'supervisores', id));
+            toast('Supervisor removido', 'info');
+        } catch (e) {
+            toast('Não foi possível excluir no Firestore. Confira as regras da coleção supervisores.', 'error');
+        }
     }
 
     window.abrirModalSupervisores = function() { document.getElementById('modalSup').classList.add('open'); renderizarSupervisores(); }
@@ -569,11 +928,22 @@
     document.getElementById('supWpp').addEventListener('input', function() { atualizarPreviewWhatsapp(this.value); });
 
     /* AUTOCOMPLETE LOCAIS */
-    function atualizarDatalistLocais() {
-        const dl = document.getElementById('locaisDL');
-        dl.innerHTML = '';
-        getLocais().forEach(l => { const opt = document.createElement('option'); opt.value = l; dl.appendChild(opt); });
-    }
+function atualizarDatalistLocais() {
+    const dl = document.getElementById('locaisDL');
+    dl.innerHTML = '';
+
+    const nomes = new Set([
+        ...getLocais(),
+        ...condominiosMemo.map(condominio => condominio.nome).filter(Boolean)
+    ]);
+
+    nomes.forEach(nome => {
+        const opcao = document.createElement('option');
+        opcao.value = nome;
+        dl.appendChild(opcao);
+    });
+}
+
 
     function adicionarLocal(nome) {
         if (!nome) return;
@@ -581,6 +951,428 @@
         const norm = nome.trim().toLowerCase();
         if (!locais.some(l => l.trim().toLowerCase() === norm)) { locais.push(nome.trim()); setLocais(locais); atualizarDatalistLocais(); }
     }
+/* CADASTRO E FICHA DE CONDOMÍNIOS */
+function aliasesCondominio(c) {
+    return Array.isArray(c.aliases) ? c.aliases : [];
+}
+
+function extrasDoCondominio(c) {
+    const nomes = [c.nome, ...aliasesCondominio(c)].map(normalizarNomeLocal);
+    return dadosMemo.filter(x =>
+        x.condominioId === c._id || nomes.includes(normalizarNomeLocal(x.emp))
+    );
+}
+
+window.abrirAbaCondominio = function(id, botao) {
+    document.querySelectorAll('.condo-tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.condo-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    botao.classList.add('active');
+};
+
+function atualizarAbaInicial() {
+    document.querySelectorAll('.condo-tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.condo-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('abaGeral').classList.add('active');
+    document.querySelector('.condo-tab-btn')?.classList.add('active');
+}
+
+function lerTorresDoFormulario() {
+    return [...document.querySelectorAll('.tower-card')].map(card => {
+        const nome = card.querySelector('.tower-nome').value.trim();
+        const andares = parseInt(card.querySelector('.tower-andares').value, 10) || 0;
+        const apartamentosPorAndar = parseInt(card.querySelector('.tower-apartamentos').value, 10) || 0;
+
+        return {
+            nome,
+            andares,
+            apartamentosPorAndar,
+            totalApartamentos: andares * apartamentosPorAndar
+        };
+    });
+}
+
+function htmlTorre(torre = {}) {
+    const total = (Number(torre.andares) || 0) * (Number(torre.apartamentosPorAndar) || 0);
+
+    return `<div class="tower-card">
+        <div class="tower-fields">
+            <div class="field tower-name">
+                <label>Nome da torre (opcional)</label>
+                <input class="tower-nome" value="${escaparHTML(torre.nome || '')}" placeholder="Ex.: Brisa, Serra ou Torre 1">
+            </div>
+            <div class="field">
+                <label>Andares</label>
+                <input class="tower-andares" type="number" min="0" step="1" value="${torre.andares || ''}">
+            </div>
+            <div class="field">
+                <label>Apartamentos por andar</label>
+                <input class="tower-apartamentos" type="number" min="0" step="1" value="${torre.apartamentosPorAndar || ''}">
+            </div>
+        </div>
+        <div class="tower-total">Total desta torre: <span>${total}</span> apartamentos</div>
+        <button class="condo-small-btn" type="button"
+            onclick="this.closest('.tower-card').remove(); atualizarTotalApartamentos();">Remover torre</button>
+    </div>`;
+}
+
+function renderizarEditorTorres(torres = []) {
+    document.getElementById('listaTorres').innerHTML = torres.map(htmlTorre).join('');
+    atualizarTotalApartamentos();
+}
+
+window.adicionarTorre = function() {
+    const torres = lerTorresDoFormulario();
+    torres.push({ nome: '', andares: 0, apartamentosPorAndar: 0 });
+    renderizarEditorTorres(torres);
+};
+
+window.atualizarTotalApartamentos = function() {
+    let totalGeral = 0;
+
+    document.querySelectorAll('.tower-card').forEach(card => {
+        const andares = parseInt(card.querySelector('.tower-andares').value, 10) || 0;
+        const porAndar = parseInt(card.querySelector('.tower-apartamentos').value, 10) || 0;
+        const total = andares * porAndar;
+
+        card.querySelector('.tower-total span').textContent = total;
+        totalGeral += total;
+    });
+
+    const totalEl = document.getElementById('totalAptCondominio');
+    if (totalEl) totalEl.textContent = totalGeral;
+};
+
+document.getElementById('listaTorres').addEventListener('input', atualizarTotalApartamentos);
+
+function nomesZeladoresAtuais() {
+    return [...document.querySelectorAll('.nome-zelador')].map(i => i.value);
+}
+
+function renderizarNomesZeladores(nomes = []) {
+    const quantidade = Math.min(
+        Math.max(parseInt(document.getElementById('condZeladores').value, 10) || 0, 0),
+        100
+    );
+
+    const valores = [...nomes];
+    document.getElementById('nomesZeladores').innerHTML =
+        Array.from({ length: quantidade }, (_, i) => `
+            <div class="field">
+                <label>Nome do zelador ${i + 1}</label>
+                <input class="nome-zelador" type="text" value="${escaparHTML(valores[i] || '')}"
+                    placeholder="Nome do zelador ${i + 1}">
+            </div>
+        `).join('');
+}
+
+document.getElementById('condZeladores').addEventListener('input', function() {
+    renderizarNomesZeladores(nomesZeladoresAtuais());
+});
+
+function lerRadio(nome) {
+    return document.querySelector(`input[name="${nome}"]:checked`)?.value || '';
+}
+
+function marcarRadio(nome, valor) {
+    document.querySelectorAll(`input[name="${nome}"]`).forEach(input => {
+        input.checked = input.value === valor;
+    });
+}
+
+function escolhaSimNao(valor) {
+    return valor === true ? 'sim' : valor === false ? 'nao' : '';
+}
+
+function marcarSimNao(nome, valor) {
+    marcarRadio(nome, escolhaSimNao(valor));
+}
+
+function atualizarCamposAdm() {
+    const temAdm = lerRadio('temAdm') === 'sim';
+    document.getElementById('admContactFields')?.classList.toggle('visible', temAdm);
+}
+
+document.querySelectorAll('input[name="temAdm"]').forEach(input => {
+    input.addEventListener('change', atualizarCamposAdm);
+});
+
+window.limparFormCondominio = function() {
+    editandoCondominioId = null;
+
+    ['condNome', 'condPortarias', 'condPorteiros', 'condZeladores',
+     'condAdmNome', 'condAdmWhatsapp', 'condRotina', 'condObs', 'condAliases'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+
+    document.querySelectorAll('#modalCondominios input[type="radio"]').forEach(i => i.checked = false);
+    document.querySelectorAll('input[name="diasLimpeza"]').forEach(i => i.checked = false);
+    atualizarCamposAdm();
+
+    renderizarEditorTorres([]);
+    renderizarNomesZeladores([]);
+    atualizarAbaInicial();
+    document.getElementById('btnSalvarCondominio').textContent = 'Salvar condomínio';
+};
+
+window.abrirModalCondominios = function() {
+    document.getElementById('modalCondominios').classList.add('open');
+    document.getElementById('condoManagerView').style.display = 'block';
+    document.getElementById('condoDetailView').style.display = 'none';
+    renderizarListaCondominios();
+};
+
+window.fecharModalCondominios = function() {
+    document.getElementById('modalCondominios').classList.remove('open');
+    document.getElementById('condoManagerView').style.display = 'block';
+    document.getElementById('condoDetailView').style.display = 'none';
+    condominioSelecionadoId = null;
+    window.limparFormCondominio();
+};
+
+document.getElementById('modalCondominios').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalCondominios();
+});
+
+function renderizarListaCondominios() {
+    const lista = document.getElementById('condoLista');
+    if (!lista) return;
+
+    const busca = normalizarNomeLocal(document.getElementById('condBusca')?.value || '');
+    const itens = condominiosMemo.filter(c => normalizarNomeLocal(c.nome).includes(busca));
+
+    if (!itens.length) {
+        lista.innerHTML = `<div class="empty-state">
+            <div class="empty-state-icon">🏢</div>
+            ${condominiosMemo.length ? 'Nenhum condomínio corresponde à busca.' : 'Ainda não há condomínios cadastrados.'}
+        </div>`;
+        return;
+    }
+
+    lista.innerHTML = itens.map(c => {
+        const extras = extrasDoCondominio(c);
+        const recebido = extras.filter(x => x.pago)
+            .reduce((s, x) => s + (Number(x.val) || 0), 0);
+
+        return `<div class="condo-item">
+            <div><strong>${escaparHTML(c.nome)}</strong>
+            <small>${extras.length} extra(s) · Recebido: R$ ${formatarMoeda(recebido)}</small></div>
+            <div class="condo-item-actions">
+                <button class="condo-action-btn" type="button" onclick="verCondominio('${escaparHTML(c._id)}')">Abrir ficha</button>
+                <button class="condo-action-btn secondary" type="button" onclick="editarCondominio('${escaparHTML(c._id)}')">Editar</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.editarCondominio = function(id) {
+    const c = condominiosMemo.find(x => x._id === id);
+    if (!c) return;
+
+    condominioSelecionadoId = null;
+    document.getElementById('condoManagerView').style.display = 'block';
+    document.getElementById('condoDetailView').style.display = 'none';
+    editandoCondominioId = id;
+
+    document.getElementById('condNome').value = c.nome || '';
+    document.getElementById('condPortarias').value = c.portarias ?? '';
+    document.getElementById('condPorteiros').value = c.porteiros ?? '';
+    document.getElementById('condZeladores').value = c.zeladores ?? 0;
+    const adm = c.administracao || {};
+    marcarSimNao('temAdm', adm.temAdm);
+    document.getElementById('condAdmNome').value = adm.nome || '';
+    document.getElementById('condAdmWhatsapp').value = adm.whatsapp || '';
+    atualizarCamposAdm();
+    document.getElementById('condRotina').value = c.rotina || '';
+    document.getElementById('condObs').value = c.observacoes || '';
+    document.getElementById('condAliases').value = aliasesCondominio(c).join('\n');
+
+    const torres = Array.isArray(c.detalhesTorres)
+        ? c.detalhesTorres
+        : Array.from({ length: Math.min(Number(c.torres) || 0, 50) }, () => ({}));
+
+    renderizarEditorTorres(torres);
+    renderizarNomesZeladores(c.nomesZeladores || []);
+
+    const s = c.portariaSeguranca || {};
+    marcarSimNao('severino', s.severino);
+    marcarRadio('protocolo', s.protocolo || '');
+    marcarSimNao('facial', s.reconhecimentoFacial);
+    marcarSimNao('placa', s.aberturaPorPlaca);
+    marcarSimNao('portariaVirtual', s.portariaVirtual);
+    marcarSimNao('portariaHumana', s.portariaHumana);
+
+    document.querySelectorAll('input[name="diasLimpeza"]').forEach(input => {
+        input.checked = (c.diasLimpeza || []).includes(input.value);
+    });
+
+    atualizarAbaInicial();
+    document.getElementById('btnSalvarCondominio').textContent = 'Salvar alterações';
+};
+
+window.salvarCondominio = async function() {
+    const nome = document.getElementById('condNome').value.trim();
+    if (!nome) return toast('Informe o nome do condomínio.', 'error');
+
+    const anterior = editandoCondominioId
+        ? condominiosMemo.find(c => c._id === editandoCondominioId)
+        : null;
+
+    if (condominiosMemo.some(c =>
+        c._id !== editandoCondominioId &&
+        normalizarNomeLocal(c.nome) === normalizarNomeLocal(nome)
+    )) return toast('Já existe um cadastro com esse nome.', 'error');
+
+    const aliasesDigitados = document.getElementById('condAliases').value
+        .split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+
+    const aliases = [...new Set([
+        ...aliasesDigitados,
+        ...(anterior && anterior.nome !== nome ? [anterior.nome] : [])
+    ])];
+
+    const detalhesTorres = lerTorresDoFormulario();
+    const totalApartamentos = detalhesTorres.reduce((s, t) => s + t.totalApartamentos, 0);
+    const quantidadeZeladores = parseInt(document.getElementById('condZeladores').value, 10) || 0;
+    const nomesZeladores = nomesZeladoresAtuais().map(n => n.trim()).filter(Boolean);
+    const radioBool = nome => lerRadio(nome) === 'sim' ? true : lerRadio(nome) === 'nao' ? false : null;
+    const temAdm = radioBool('temAdm');
+    const nomeAdm = document.getElementById('condAdmNome').value.trim();
+    const whatsappAdm = normalizarWhatsapp(document.getElementById('condAdmWhatsapp').value.trim());
+    const diasLimpeza = [...document.querySelectorAll('input[name="diasLimpeza"]:checked')]
+        .map(input => input.value);
+
+    const agora = Date.now();
+    const dados = {
+        nome,
+        torres: detalhesTorres.length,
+        detalhesTorres,
+        totalApartamentos,
+        portarias: parseInt(document.getElementById('condPortarias').value, 10) || 0,
+        porteiros: parseInt(document.getElementById('condPorteiros').value, 10) || 0,
+        zeladores: quantidadeZeladores,
+        nomesZeladores,
+        administracao: {
+            temAdm,
+            nome: temAdm ? nomeAdm : '',
+            whatsapp: temAdm ? whatsappAdm : ''
+        },
+        rotina: document.getElementById('condRotina').value.trim(),
+        observacoes: document.getElementById('condObs').value.trim(),
+        aliases,
+        portariaSeguranca: {
+            severino: radioBool('severino'),
+            protocolo: lerRadio('protocolo') || null,
+            reconhecimentoFacial: radioBool('facial'),
+            aberturaPorPlaca: radioBool('placa'),
+            portariaVirtual: radioBool('portariaVirtual'),
+            portariaHumana: radioBool('portariaHumana')
+        },
+        diasLimpeza,
+        atualizadoEm: agora,
+        ...(anterior ? {} : { criadoEm: agora })
+    };
+
+    try {
+        if (editandoCondominioId) {
+            await updateDoc(doc(db, 'condominios', editandoCondominioId), dados);
+        } else {
+            await addDoc(collection(db, 'condominios'), dados);
+        }
+
+        adicionarLocal(nome);
+        window.limparFormCondominio();
+        toast(anterior ? 'Condomínio atualizado!' : 'Condomínio cadastrado!');
+    } catch (e) {
+        toast('Não foi possível salvar. Confira as regras de acesso do Firestore.', 'error');
+    }
+};
+
+function textoSimNao(valor) {
+    return valor === true ? 'Sim' : valor === false ? 'Não' : 'Não informado';
+}
+
+window.verCondominio = function(id) {
+    const c = condominiosMemo.find(x => x._id === id);
+    if (!c) return;
+
+    condominioSelecionadoId = id;
+    const extras = extrasDoCondominio(c).sort((a, b) => (b.dataE || '').localeCompare(a.dataE || ''));
+    const recebido = extras.filter(x => x.pago).reduce((s, x) => s + (Number(x.val) || 0), 0);
+    const pendente = extras.filter(x => !x.pago).reduce((s, x) => s + (Number(x.val) || 0), 0);
+    const torres = Array.isArray(c.detalhesTorres) ? c.detalhesTorres : [];
+    const totalApt = torres.reduce((s, t) =>
+        s + (Number(t.totalApartamentos) || (Number(t.andares) || 0) * (Number(t.apartamentosPorAndar) || 0)), 0);
+    const seg = c.portariaSeguranca || {};
+    const adm = c.administracao || {};
+
+    const detalhe = document.getElementById('condoDetailView');
+
+    detalhe.innerHTML = `
+        <div class="condo-detail-top">
+            <h4>${escaparHTML(c.nome)}</h4>
+            <button class="condo-action-btn secondary" type="button" onclick="voltarListaCondominios()">← Voltar</button>
+        </div>
+
+        <div class="condo-facts">
+            <div class="condo-fact"><span>Torres</span><strong>${torres.length || c.torres || 0}</strong></div>
+            <div class="condo-fact"><span>Portarias</span><strong>${c.portarias ?? 'Não informado'}</strong></div>
+            <div class="condo-fact"><span>Porteiros</span><strong>${c.porteiros ?? 'Não informado'}</strong></div>
+            <div class="condo-fact"><span>Zeladores</span><strong>${c.zeladores ?? 0}</strong></div>
+            <div class="condo-fact"><span>Tem ADM?</span><strong>${textoSimNao(adm.temAdm)}</strong></div>
+            <div class="condo-fact"><span>Apartamentos no total</span><strong>${totalApt}</strong></div>
+            <div class="condo-fact"><span>Extras registradas</span><strong>${extras.length}</strong></div>
+            <div class="condo-fact"><span>Recebido</span><strong>R$ ${formatarMoeda(recebido)}</strong></div>
+            <div class="condo-fact"><span>Pendente</span><strong>R$ ${formatarMoeda(pendente)}</strong></div>
+        </div>
+
+        ${c.nomesZeladores?.length
+            ? `<div class="condo-notes"><strong>Zeladores:</strong><br>${c.nomesZeladores.map(escaparHTML).join('<br>')}</div>`
+            : ''}
+        ${adm.temAdm ? `<div class="condo-notes"><strong>ADM:</strong> ${escaparHTML(adm.nome || 'Nome não informado')}<br><strong>WhatsApp:</strong> ${escaparHTML(adm.whatsapp ? formatarTelefone(adm.whatsapp) : 'Não informado')}</div>` : ''}
+
+        ${torres.length ? `<div class="sup-divider">Detalhes das torres</div>${torres.map((t, i) => `
+            <div class="condo-notes"><strong>${escaparHTML(t.nome || `Torre ${i + 1}`)}</strong><br>
+            Andares: ${Number(t.andares) || 0} · Apartamentos por andar: ${Number(t.apartamentosPorAndar) || 0}
+            · Total da torre: ${Number(t.totalApartamentos) || 0}</div>`).join('')}` : ''}
+
+        <div class="sup-divider">Portaria e segurança</div>
+        <div class="condo-notes">
+            Sistema Severino: ${textoSimNao(seg.severino)}<br>
+            Protocolos: ${escaparHTML(seg.protocolo || 'Não informado')}<br>
+            Reconhecimento facial: ${textoSimNao(seg.reconhecimentoFacial)}<br>
+            Abertura por placa: ${textoSimNao(seg.aberturaPorPlaca)}<br>
+            Portaria virtual/remota: ${textoSimNao(seg.portariaVirtual)}<br>
+            Portaria com funcionário: ${textoSimNao(seg.portariaHumana)}
+        </div>
+
+        <div class="sup-divider">Dias de limpeza</div>
+        <div class="condo-notes">${(c.diasLimpeza || []).length ? c.diasLimpeza.map(escaparHTML).join(', ') : 'Não informado'}</div>
+
+        ${c.rotina ? `<div class="condo-notes"><strong>Rotina:</strong> ${escaparHTML(c.rotina)}</div>` : ''}
+        ${c.observacoes ? `<div class="condo-notes"><strong>Observações:</strong> ${escaparHTML(c.observacoes)}</div>` : ''}
+
+        <div class="sup-divider">Histórico de extras</div>
+        ${extras.length ? `<div class="condo-history"><table>
+            <thead><tr><th>Data</th><th>Função</th><th>Supervisor</th><th>Valor</th><th>Status</th></tr></thead>
+            <tbody>${extras.map(x => `<tr>
+                <td>${formatarData(x.dataE)}</td><td>${escaparHTML(x.fun || '-')}</td>
+                <td>${escaparHTML(x.sup || '-')}</td><td>R$ ${formatarMoeda(Number(x.val) || 0)}</td>
+                <td>${x.pago ? 'PAGO' : 'PENDENTE'}</td>
+            </tr>`).join('')}</tbody>
+        </table></div>` : '<div class="empty-state">Ainda não há extras associadas a este condomínio.</div>'}
+    `;
+
+    document.getElementById('condoManagerView').style.display = 'none';
+    detalhe.style.display = 'block';
+};
+
+window.voltarListaCondominios = function() {
+    condominioSelecionadoId = null;
+    document.getElementById('condoDetailView').style.display = 'none';
+    document.getElementById('condoManagerView').style.display = 'block';
+    renderizarListaCondominios();
+};
 
     /* INDICADOR WHATSAPP */
     function getSupervisorWhatsapp(nome) {
@@ -931,7 +1723,18 @@
         if (!fun) return toast('Informe a funcao!', 'error');
         if (val <= 0) return toast('Informe um valor valido!', 'error');
 
-        const d = { dataE, emp, sup, fun, val, prev, pago: false, timestamp: new Date().getTime() };
+const chaveLocal = normalizarNomeLocal(emp);
+const condo = condominiosMemo.find(item =>
+    [item.nome, ...aliasesCondominio(item)]
+        .some(nomeLocal => normalizarNomeLocal(nomeLocal) === chaveLocal)
+);
+
+// Mantém emp para os relatórios atuais; o ID liga a extra ao perfil cadastrado.
+const d = {
+    dataE, emp, sup, fun, val, prev, pago: false,
+    timestamp: new Date().getTime(),
+    ...(condo ? { condominioId: condo._id } : {})
+};
 
         try {
             await addDoc(collection(db, "trabalhos_extras"), d);
@@ -968,6 +1771,89 @@
         snap.forEach((docSnap) => { const item = docSnap.data(); item._id = docSnap.id; dadosMemo.push(item); });
         renderizarTabela();
         renderizarMensal();
+        renderizarListaCondominios();
+if (condominioSelecionadoId) {
+    window.verCondominio(condominioSelecionadoId);
+}
+
+    });
+    // Nova coleção de perfis; não altera os documentos antigos de trabalhos_extras.
+onSnapshot(collection(db, 'condominios'), (snap) => {
+    condominiosMemo = [];
+
+    snap.forEach(docSnap => {
+        const item = docSnap.data();
+        item._id = docSnap.id;
+        condominiosMemo.push(item);
+    });
+
+    condominiosMemo.sort((a, b) =>
+        (a.nome || '').localeCompare(b.nome || '', 'pt-BR')
+    );
+
+    atualizarDatalistLocais();
+    renderizarListaCondominios();
+
+    if (condominioSelecionadoId) {
+        window.verCondominio(condominioSelecionadoId);
+    }
+}, () => {
+    toast('Não foi possível carregar condomínios. Confira as regras do Firestore.', 'error');
+});
+
+
+    /* FIRESTORE — SUPERVISORES */
+    onSnapshot(collection(db, 'supervisores'), async (snap) => {
+        const listaFirestore = [];
+        snap.forEach(docSnap => listaFirestore.push({ id: docSnap.id, ...docSnap.data() }));
+
+        // Migra uma única vez os supervisores antigos deste navegador, sem apagar o cache.
+        const chaveMigracao = 'extras_supervisores_migrados_firestore';
+        let migracaoConcluida = false;
+        try { migracaoConcluida = localStorage.getItem(chaveMigracao) === '1'; } catch {}
+
+        if (snap.empty && !migracaoSupervisoresTentada && !migracaoConcluida) {
+            migracaoSupervisoresTentada = true;
+            const antigos = lerCacheSupervisores().filter(s => s && s.nome);
+            if (antigos.length) {
+                try {
+                    const lote = writeBatch(db);
+                    antigos.forEach(s => {
+                        const referencia = doc(collection(db, 'supervisores'));
+                        lote.set(referencia, {
+                            nome: String(s.nome).trim(),
+                            whatsapp: normalizarWhatsapp(String(s.whatsapp || '')),
+                            criadoEm: Date.now()
+                        });
+                    });
+                    await lote.commit();
+                    try { localStorage.setItem(chaveMigracao, '1'); } catch {}
+                    toast('Supervisores antigos copiados para o Firestore.');
+                    return;
+                } catch (e) {
+                    supervisoresMemo = antigos.map((s, i) => ({ ...s, id: String(s.id || `local-${i}`) }));
+                    atualizarDatalistSupervisores();
+                    renderizarSupervisores();
+                    toast('Não consegui migrar os supervisores. Eles continuam no cache deste navegador; confira as regras da coleção supervisores.', 'error');
+                    return;
+                }
+            } else {
+                try { localStorage.setItem(chaveMigracao, '1'); } catch {}
+            }
+        }
+
+        if (!snap.empty) {
+            try { localStorage.setItem(chaveMigracao, '1'); } catch {}
+        }
+        supervisoresMemo = listaFirestore;
+        guardarCacheSupervisores(supervisoresMemo);
+        atualizarDatalistSupervisores();
+        renderizarSupervisores();
+    }, () => {
+        // Se Firestore não estiver disponível, mantém visível o cache local existente.
+        atualizarDatalistSupervisores();
+        renderizarSupervisores();
+        toast('Não foi possível carregar supervisores do Firestore. Os dados locais deste navegador foram mantidos.', 'error');
     });
 
     /* INICIALIZAÇÃO */
