@@ -496,6 +496,22 @@
 .extras-section .monthly-header { cursor: pointer; }
 .extras-section .monthly-header:focus-visible { outline: 3px solid #93c5fd; outline-offset: -3px; }
 
+
+.btn-edit { background: var(--primary-light); color: var(--primary); }
+.btn-edit:hover { background: #bfdbfe; transform: scale(1.08); }
+.btn-cancel-edit { background: #64748b; color: #fff; }
+.btn-cancel-edit:hover { background: #475569; }
+.extras-search {
+    display: flex; align-items: center; gap: 9px; margin: 0 0 14px;
+    padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 10px;
+    background: #fff; color: var(--text-muted);
+}
+.extras-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(29,78,216,.1); }
+.extras-search span { font-size: 1rem; }
+.extras-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; color: var(--text); }
+.condo-action-btn.danger { background: var(--danger); color: #fff; }
+.condo-action-btn.danger:hover { background: #b91c1c; }
+
 </style>
 </head>
 <body>
@@ -545,7 +561,8 @@
 
     <div class="actions-bar">
         <label class="wpp-check"><input type="checkbox" id="chkWpp"><span class="wpp-box">✓</span>Enviar WhatsApp</label>
-        <button class="btn btn-save" onclick="adicionar()">SALVAR REGISTRO</button>
+        <button class="btn btn-save" id="btnSalvarExtra" onclick="adicionar()">SALVAR REGISTRO</button>
+        <button class="btn btn-cancel-edit" id="btnCancelarEdicaoExtra" onclick="cancelarEdicaoExtra()" style="display:none">CANCELAR EDIÇÃO</button>
         <button class="btn btn-print" onclick="window.print()">RELATORIO PDF</button>
     </div>
 
@@ -560,6 +577,10 @@
         </div>
         <div class="monthly-body" id="extrasBody">
             <div class="extras-content">
+                <div class="extras-search">
+                    <span aria-hidden="true">🔍</span>
+                    <input id="buscaExtras" type="search" placeholder="Buscar por local, supervisor, função ou data..." oninput="buscarExtras(this.value)" aria-label="Buscar extras">
+                </div>
                 <div class="filters-bar">
                     <button class="filter-btn active" onclick="filtrar('todos', this)">Todos <span class="filter-count" id="countTodos">0</span></button>
                     <button class="filter-btn" onclick="filtrar('pendente', this)">Pendentes <span class="filter-count" id="countPendentes">0</span></button>
@@ -1182,10 +1203,30 @@ function renderizarListaCondominios() {
             <div class="condo-item-actions">
                 <button class="condo-action-btn" type="button" onclick="verCondominio('${escaparHTML(c._id)}')">Abrir ficha</button>
                 <button class="condo-action-btn secondary" type="button" onclick="editarCondominio('${escaparHTML(c._id)}')">Editar</button>
+                <button class="condo-action-btn danger" type="button" onclick="excluirCondominio('${escaparHTML(c._id)}')">Excluir</button>
             </div>
         </div>`;
     }).join('');
 }
+window.renderizarListaCondominios = renderizarListaCondominios;
+
+window.excluirCondominio = async function(id) {
+    const c = condominiosMemo.find(item => item._id === id);
+    if (!c) return;
+    if (!confirm(`Excluir somente o cadastro do condomínio "${c.nome}"? As extras registradas não serão apagadas.`)) return;
+
+    try {
+        await deleteDoc(doc(db, 'condominios', id));
+        if (condominioSelecionadoId === id) {
+            condominioSelecionadoId = null;
+            document.getElementById('condoDetailView').style.display = 'none';
+            document.getElementById('condoManagerView').style.display = 'block';
+        }
+        toast('Cadastro do condomínio excluído. As extras foram mantidas.', 'info');
+    } catch (e) {
+        toast('Não foi possível excluir o condomínio. Confira as regras do Firestore.', 'error');
+    }
+};
 
 window.editarCondominio = function(id) {
     const c = condominiosMemo.find(x => x._id === id);
@@ -1433,6 +1474,11 @@ window.voltarListaCondominios = function() {
 
     /* FILTROS */
     let filtroAtual = 'todos';
+    let buscaExtrasAtual = '';
+    window.buscarExtras = function(valor) {
+        buscaExtrasAtual = normalizarNomeLocal(valor || '');
+        renderizarTabela();
+    };
     window.filtrar = function(tipo, btn) {
         filtroAtual = tipo;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1674,6 +1720,7 @@ window.voltarListaCondominios = function() {
        DADOS EM MEMÓRIA + TABELA
        ========================================= */
     let dadosMemo = [];
+    let editandoExtraId = null;
 
     function renderizarTabela() {
         const tbody = document.getElementById('lista');
@@ -1692,13 +1739,20 @@ window.voltarListaCondominios = function() {
         document.getElementById('countPagos').textContent = totalPagos;
 
         const filtrados = dadosMemo.filter(item => {
-            if (filtroAtual === 'pendente') return !item.pago;
-            if (filtroAtual === 'pago') return item.pago;
-            return true;
+            const passaStatus = filtroAtual === 'pendente' ? !item.pago
+                : filtroAtual === 'pago' ? !!item.pago : true;
+            if (!passaStatus) return false;
+            if (!buscaExtrasAtual) return true;
+            const textoBusca = normalizarNomeLocal([
+                item.dataE, formatarData(item.dataE), item.emp, item.sup, item.fun,
+                item.prev, formatarData(item.prev), item.val, formatarMoeda(Number(item.val) || 0),
+                item.pago ? 'pago' : 'pendente'
+            ].join(' '));
+            return textoBusca.includes(buscaExtrasAtual);
         });
 
         if (filtrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-table"><div class="empty-table-icon">📋</div><div class="empty-table-text">${dadosMemo.length === 0 ? 'Nenhum registro cadastrado ainda' : 'Nenhum registro encontrado para este filtro'}</div></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-table"><div class="empty-table-icon">📋</div><div class="empty-table-text">${dadosMemo.length === 0 ? 'Nenhum registro cadastrado ainda' : 'Nenhum registro encontrado para a busca ou filtro'}</div></div></td></tr>`;
         } else {
             filtrados.forEach((item, idx) => {
                 const id = item._id;
@@ -1717,6 +1771,7 @@ window.voltarListaCondominios = function() {
                     <td>
                         <div class="btn-row-action">
                             <button class="btn-action btn-wpp ${temWpp ? '' : 'off'}" title="${temWpp ? 'Enviar WhatsApp' : 'Sem WhatsApp cadastrado'}" onclick="enviarWhatsApp('${id}')">💬</button>
+                            <button class="btn-action btn-edit" title="Editar registro" onclick="editarExtra('${escaparHTML(id)}')">✎</button>
                             <button class="btn-action btn-ok" title="${item.pago ? 'Marcar como Pendente' : 'Marcar como Pago'}" onclick="alternar('${id}', ${item.pago})">✔</button>
                             <button class="btn-action btn-del" title="Excluir registro" onclick="excluir('${id}')">✖</button>
                         </div>
@@ -1737,6 +1792,34 @@ window.voltarListaCondominios = function() {
     /* =========================================
        FIREBASE — FUNÇÕES (INALTERADAS)
        ========================================= */
+    window.editarExtra = function(id) {
+        const item = dadosMemo.find(registro => registro._id === id);
+        if (!item) return toast('Não encontrei essa extra para editar.', 'error');
+
+        editandoExtraId = id;
+        document.getElementById('dataE').value = item.dataE || '';
+        document.getElementById('emp').value = item.emp || '';
+        document.getElementById('sup').value = item.sup || '';
+        document.getElementById('fun').value = item.fun || '';
+        document.getElementById('val').value = Number(item.val || 0).toFixed(2);
+        document.getElementById('prev').value = item.prev || '';
+        document.getElementById('chkWpp').checked = false;
+        document.getElementById('btnSalvarExtra').textContent = 'ATUALIZAR REGISTRO';
+        document.getElementById('btnCancelarEdicaoExtra').style.display = 'flex';
+        document.getElementById('sup').dispatchEvent(new Event('input'));
+        document.getElementById('dataE').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    window.cancelarEdicaoExtra = function() {
+        editandoExtraId = null;
+        document.getElementById('fun').value = '';
+        document.getElementById('val').value = '';
+        document.getElementById('chkWpp').checked = false;
+        document.getElementById('btnSalvarExtra').textContent = 'SALVAR REGISTRO';
+        document.getElementById('btnCancelarEdicaoExtra').style.display = 'none';
+        toast('Edição cancelada.', 'info');
+    };
+
     window.adicionar = async function() {
         const dataE = document.getElementById('dataE').value;
         const emp = document.getElementById('emp').value.trim();
@@ -1752,33 +1835,56 @@ window.voltarListaCondominios = function() {
         if (!fun) return toast('Informe a funcao!', 'error');
         if (val <= 0) return toast('Informe um valor valido!', 'error');
 
-const chaveLocal = normalizarNomeLocal(emp);
-const condo = condominiosMemo.find(item =>
-    [item.nome, ...aliasesCondominio(item)]
-        .some(nomeLocal => normalizarNomeLocal(nomeLocal) === chaveLocal)
-);
+        const chaveLocal = normalizarNomeLocal(emp);
+        const condo = condominiosMemo.find(item =>
+            [item.nome, ...aliasesCondominio(item)]
+                .some(nomeLocal => normalizarNomeLocal(nomeLocal) === chaveLocal)
+        );
+        const registroOriginal = editandoExtraId
+            ? dadosMemo.find(item => item._id === editandoExtraId)
+            : null;
+        const d = {
+            dataE, emp, sup, fun, val, prev,
+            pago: registroOriginal ? !!registroOriginal.pago : false,
+            timestamp: registroOriginal?.timestamp ?? new Date().getTime(),
+            ...(condo ? { condominioId: condo._id } : {})
+        };
 
-// Mantém emp para os relatórios atuais; o ID liga a extra ao perfil cadastrado.
-const d = {
-    dataE, emp, sup, fun, val, prev, pago: false,
-    timestamp: new Date().getTime(),
-    ...(condo ? { condominioId: condo._id } : {})
-};
-
+        const idEditado = editandoExtraId;
         try {
-            await addDoc(collection(db, "trabalhos_extras"), d);
+            if (idEditado) {
+                await updateDoc(doc(db, 'trabalhos_extras', idEditado), {
+                    dataE, emp, sup, fun, val, prev,
+                    condominioId: condo ? condo._id : null,
+                    atualizadoEm: Date.now()
+                });
+                toast('Registro atualizado com sucesso!');
+            } else {
+                await addDoc(collection(db, 'trabalhos_extras'), d);
+                toast('Registro salvo com sucesso!');
+            }
+
             adicionarLocal(emp);
+            if (idEditado) {
+                editandoExtraId = null;
+                document.getElementById('btnSalvarExtra').textContent = 'SALVAR REGISTRO';
+                document.getElementById('btnCancelarEdicaoExtra').style.display = 'none';
+            }
             document.getElementById('fun').value = '';
             document.getElementById('val').value = '';
-            toast('Registro salvo com sucesso!');
 
             if (enviarWpp) {
                 const wpp = getSupervisorWhatsapp(sup);
-                if (wpp) { window.open(`https://wa.me/55${wpp}?text=${encodeURIComponent(gerarMensagem(d))}`, '_blank'); }
-                else { toast('Supervisor sem WhatsApp cadastrado', 'error'); }
+                if (wpp) {
+                    window.open(`https://wa.me/55${wpp}?text=${encodeURIComponent(gerarMensagem(d))}`, '_blank');
+                } else {
+                    toast('Supervisor sem WhatsApp cadastrado', 'error');
+                }
                 document.getElementById('chkWpp').checked = false;
             }
-        } catch (e) { toast('Erro ao salvar! Verifique as regras no Firebase.', 'error'); }
+        } catch (e) {
+            toast(idEditado ? 'Erro ao atualizar! Verifique as regras no Firebase.' : 'Erro ao salvar! Verifique as regras no Firebase.', 'error');
+        }
     }
 
     window.alternar = async (id, status) => {
