@@ -488,6 +488,14 @@
     #modalCondominios .adm-contact-fields { grid-template-columns: 1fr; }
 }
 
+
+/* Lista de extras recolhida por padrão; o resumo financeiro permanece visível. */
+.extras-section .monthly-body { transition: max-height .4s ease; }
+.extras-section.open .monthly-body { max-height: 100000px; }
+.extras-content { padding: 0 22px 20px; }
+.extras-section .monthly-header { cursor: pointer; }
+.extras-section .monthly-header:focus-visible { outline: 3px solid #93c5fd; outline-offset: -3px; }
+
 </style>
 </head>
 <body>
@@ -541,17 +549,31 @@
         <button class="btn btn-print" onclick="window.print()">RELATORIO PDF</button>
     </div>
 
-    <div class="filters-bar">
-        <button class="filter-btn active" onclick="filtrar('todos', this)">Todos <span class="filter-count" id="countTodos">0</span></button>
-        <button class="filter-btn" onclick="filtrar('pendente', this)">Pendentes <span class="filter-count" id="countPendentes">0</span></button>
-        <button class="filter-btn" onclick="filtrar('pago', this)">Pagos <span class="filter-count" id="countPagos">0</span></button>
-    </div>
+    <div class="monthly-section extras-section" id="extrasSection">
+        <div class="monthly-header" role="button" tabindex="0" aria-expanded="false" aria-controls="extrasBody"
+             onclick="toggleExtrasList()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleExtrasList();}">
+            <div class="monthly-header-left">
+                <h3>Lista de Extras</h3>
+                <span class="monthly-badge" id="extrasBadge">0 registros</span>
+            </div>
+            <div class="monthly-toggle">▼</div>
+        </div>
+        <div class="monthly-body" id="extrasBody">
+            <div class="extras-content">
+                <div class="filters-bar">
+                    <button class="filter-btn active" onclick="filtrar('todos', this)">Todos <span class="filter-count" id="countTodos">0</span></button>
+                    <button class="filter-btn" onclick="filtrar('pendente', this)">Pendentes <span class="filter-count" id="countPendentes">0</span></button>
+                    <button class="filter-btn" onclick="filtrar('pago', this)">Pagos <span class="filter-count" id="countPagos">0</span></button>
+                </div>
 
-    <div class="table-wrapper">
-        <table>
-            <thead><tr><th>Data</th><th>Local</th><th>Supervisor</th><th>Funcao</th><th>Previsao</th><th>Valor</th><th>Status</th><th>Acoes</th></tr></thead>
-            <tbody id="lista"></tbody>
-        </table>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Data</th><th>Local</th><th>Supervisor</th><th>Funcao</th><th>Previsao</th><th>Valor</th><th>Status</th><th>Acoes</th></tr></thead>
+                        <tbody id="lista"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="footer-summary">
@@ -1403,6 +1425,11 @@ window.voltarListaCondominios = function() {
     window.enviarWhatsApp = function(docId) { const item = dadosMemo.find(d => d._id === docId); if (item) abrirWhatsApp(item); }
 
     window.toggleMonthly = function() { document.getElementById('monthlySection').classList.toggle('open'); }
+    window.toggleExtrasList = function() {
+        const section = document.getElementById('extrasSection');
+        const aberto = section.classList.toggle('open');
+        section.querySelector('.monthly-header').setAttribute('aria-expanded', String(aberto));
+    }
 
     /* FILTROS */
     let filtroAtual = 'todos';
@@ -1651,6 +1678,8 @@ window.voltarListaCondominios = function() {
     function renderizarTabela() {
         const tbody = document.getElementById('lista');
         tbody.innerHTML = '';
+        const extrasBadge = document.getElementById('extrasBadge');
+        if (extrasBadge) extrasBadge.textContent = `${dadosMemo.length} ${dadosMemo.length === 1 ? 'registro' : 'registros'}`;
 
         let geralRecebido = 0, geralPendente = 0, totalPagos = 0, totalPendentes = 0;
         dadosMemo.forEach(item => {
