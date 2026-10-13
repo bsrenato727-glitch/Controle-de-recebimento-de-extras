@@ -487,6 +487,21 @@
 @media(max-width:600px) {
     #modalCondominios .adm-contact-fields { grid-template-columns: 1fr; }
 }
+#modalCondominios .staff-groups {
+    display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; width:100%;
+}
+#modalCondominios .staff-card {
+    padding:10px; border:1px solid var(--border); border-radius:10px; background:#fff;
+}
+#modalCondominios .staff-card .condo-choice { margin:0; }
+#modalCondominios .staff-fields {
+    display:none; grid-template-columns:1fr; gap:10px; margin-top:10px;
+}
+#modalCondominios .staff-fields.visible { display:grid; }
+#modalCondominios .staff-names { display:grid; gap:8px; }
+@media(max-width:600px) {
+    #modalCondominios .staff-groups { grid-template-columns:1fr; }
+}
 
 
 /* Lista de extras recolhida por padrão; o resumo financeiro permanece visível. */
@@ -662,6 +677,40 @@
     <div class="field wide">
       <label>Nomes dos zeladores</label>
       <div id="nomesZeladores" class="zelador-list"></div>
+    </div>
+
+    <div class="field wide">
+      <div class="condo-section-title">Funcionários do condomínio</div>
+      <div class="staff-groups">
+        <div class="staff-card">
+          <label class="condo-choice"><input id="condFunc_ronda_tem" type="checkbox" onchange="atualizarCamposFuncionario('ronda', true)"> Tem funcionário de ronda?</label>
+          <div id="camposFunc_ronda" class="staff-fields">
+            <div class="field"><label for="condFunc_ronda_qtd">Quantidade de profissionais de ronda</label><input id="condFunc_ronda_qtd" type="number" min="1" max="100" step="1" oninput="renderizarNomesFuncionario('ronda')"></div>
+            <div id="nomesFunc_ronda" class="staff-names"></div>
+          </div>
+        </div>
+        <div class="staff-card">
+          <label class="condo-choice"><input id="condFunc_vigilante_tem" type="checkbox" onchange="atualizarCamposFuncionario('vigilante', true)"> Tem vigilante?</label>
+          <div id="camposFunc_vigilante" class="staff-fields">
+            <div class="field"><label for="condFunc_vigilante_qtd">Quantidade de vigilantes</label><input id="condFunc_vigilante_qtd" type="number" min="1" max="100" step="1" oninput="renderizarNomesFuncionario('vigilante')"></div>
+            <div id="nomesFunc_vigilante" class="staff-names"></div>
+          </div>
+        </div>
+        <div class="staff-card">
+          <label class="condo-choice"><input id="condFunc_foguista_tem" type="checkbox" onchange="atualizarCamposFuncionario('foguista', true)"> Tem foguista?</label>
+          <div id="camposFunc_foguista" class="staff-fields">
+            <div class="field"><label for="condFunc_foguista_qtd">Quantidade de foguistas</label><input id="condFunc_foguista_qtd" type="number" min="1" max="100" step="1" oninput="renderizarNomesFuncionario('foguista')"></div>
+            <div id="nomesFunc_foguista" class="staff-names"></div>
+          </div>
+        </div>
+        <div class="staff-card">
+          <label class="condo-choice"><input id="condFunc_supervisor_tem" type="checkbox" onchange="atualizarCamposFuncionario('supervisor', true)"> Tem supervisor?</label>
+          <div id="camposFunc_supervisor" class="staff-fields">
+            <div class="field"><label for="condFunc_supervisor_qtd">Quantidade de supervisores</label><input id="condFunc_supervisor_qtd" type="number" min="1" max="100" step="1" oninput="renderizarNomesFuncionario('supervisor')"></div>
+            <div id="nomesFunc_supervisor" class="staff-names"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="field wide">
@@ -1113,6 +1162,75 @@ document.getElementById('condZeladores').addEventListener('input', function() {
     renderizarNomesZeladores(nomesZeladoresAtuais());
 });
 
+const TIPOS_FUNCIONARIO = [
+    { id: 'ronda', nome: 'Ronda' },
+    { id: 'vigilante', nome: 'Vigilante' },
+    { id: 'foguista', nome: 'Foguista' },
+    { id: 'supervisor', nome: 'Supervisor' }
+];
+
+function nomesFuncionarioAtuais(tipo) {
+    return [...document.querySelectorAll(`.nome-funcionario[data-funcionario="${tipo}"]`)]
+        .map(input => input.value);
+}
+
+window.renderizarNomesFuncionario = function(tipo, nomesInformados) {
+    const configuracao = TIPOS_FUNCIONARIO.find(item => item.id === tipo);
+    if (!configuracao) return;
+    const quantidadeInput = document.getElementById(`condFunc_${tipo}_qtd`);
+    const quantidade = Math.min(Math.max(parseInt(quantidadeInput.value, 10) || 0, 0), 100);
+    const nomes = Array.isArray(nomesInformados) ? [...nomesInformados] : nomesFuncionarioAtuais(tipo);
+    document.getElementById(`nomesFunc_${tipo}`).innerHTML =
+        Array.from({ length: quantidade }, (_, indice) => `
+            <div class="field">
+                <label>Nome do ${escaparHTML(configuracao.nome.toLowerCase())} ${indice + 1}</label>
+                <input class="nome-funcionario" data-funcionario="${tipo}" type="text"
+                    value="${escaparHTML(nomes[indice] || '')}"
+                    placeholder="Nome do ${escaparHTML(configuracao.nome.toLowerCase())} ${indice + 1}">
+            </div>
+        `).join('');
+};
+
+window.atualizarCamposFuncionario = function(tipo, alterado = false) {
+    const checkbox = document.getElementById(`condFunc_${tipo}_tem`);
+    const campos = document.getElementById(`camposFunc_${tipo}`);
+    if (!checkbox || !campos) return;
+    if (alterado) checkbox.dataset.alterado = 'true';
+
+    if (checkbox.checked) {
+        campos.classList.add('visible');
+        const quantidadeInput = document.getElementById(`condFunc_${tipo}_qtd`);
+        if ((parseInt(quantidadeInput.value, 10) || 0) < 1) quantidadeInput.value = '1';
+        window.renderizarNomesFuncionario(tipo, nomesFuncionarioAtuais(tipo));
+    } else {
+        campos.classList.remove('visible');
+    }
+};
+
+function carregarFuncionariosCondominio(funcionarios = {}) {
+    TIPOS_FUNCIONARIO.forEach(({ id }) => {
+        const dados = funcionarios[id] || {};
+        const checkbox = document.getElementById(`condFunc_${id}_tem`);
+        checkbox.checked = dados.tem === true;
+        checkbox.dataset.alterado = 'false';
+        const quantidade = Number(dados.quantidade) || (Array.isArray(dados.nomes) && dados.nomes.length) || 1;
+        document.getElementById(`condFunc_${id}_qtd`).value = dados.tem === true ? quantidade : '';
+        document.getElementById(`camposFunc_${id}`).classList.toggle('visible', dados.tem === true);
+        window.renderizarNomesFuncionario(id, Array.isArray(dados.nomes) ? dados.nomes : []);
+    });
+}
+
+function limparFuncionariosCondominio() {
+    TIPOS_FUNCIONARIO.forEach(({ id }) => {
+        const checkbox = document.getElementById(`condFunc_${id}_tem`);
+        checkbox.checked = false;
+        checkbox.dataset.alterado = 'false';
+        document.getElementById(`condFunc_${id}_qtd`).value = '';
+        document.getElementById(`camposFunc_${id}`).classList.remove('visible');
+        document.getElementById(`nomesFunc_${id}`).innerHTML = '';
+    });
+}
+
 function lerRadio(nome) {
     return document.querySelector(`input[name="${nome}"]:checked`)?.value || '';
 }
@@ -1154,6 +1272,7 @@ window.limparFormCondominio = function() {
 
     renderizarEditorTorres([]);
     renderizarNomesZeladores([]);
+    limparFuncionariosCondominio();
     atualizarAbaInicial();
     document.getElementById('btnSalvarCondominio').textContent = 'Salvar condomínio';
 };
@@ -1256,6 +1375,7 @@ window.editarCondominio = function(id) {
 
     renderizarEditorTorres(torres);
     renderizarNomesZeladores(c.nomesZeladores || []);
+    carregarFuncionariosCondominio(c.funcionarios || {});
 
     const s = c.portariaSeguranca || {};
     marcarSimNao('severino', s.severino);
@@ -1304,6 +1424,24 @@ window.salvarCondominio = async function() {
     const whatsappAdm = normalizarWhatsapp(document.getElementById('condAdmWhatsapp').value.trim());
     const diasLimpeza = [...document.querySelectorAll('input[name="diasLimpeza"]:checked')]
         .map(input => input.value);
+    const funcionariosExistentes = anterior && anterior.funcionarios && typeof anterior.funcionarios === 'object'
+        ? anterior.funcionarios
+        : {};
+    const funcionarios = { ...funcionariosExistentes };
+    TIPOS_FUNCIONARIO.forEach(({ id }) => {
+        const checkbox = document.getElementById(`condFunc_${id}_tem`);
+        const dadosAnteriores = funcionariosExistentes[id];
+        if (checkbox.checked) {
+            const quantidade = Math.min(Math.max(parseInt(document.getElementById(`condFunc_${id}_qtd`).value, 10) || 1, 1), 100);
+            funcionarios[id] = {
+                tem: true,
+                quantidade,
+                nomes: nomesFuncionarioAtuais(id).map(nome => nome.trim()).filter(Boolean)
+            };
+        } else if (!anterior || (dadosAnteriores && dadosAnteriores.tem === true) || checkbox.dataset.alterado === 'true') {
+            funcionarios[id] = { tem: false, quantidade: 0, nomes: [] };
+        }
+    });
 
     const agora = Date.now();
     const dados = {
@@ -1315,6 +1453,7 @@ window.salvarCondominio = async function() {
         porteiros: parseInt(document.getElementById('condPorteiros').value, 10) || 0,
         zeladores: quantidadeZeladores,
         nomesZeladores,
+        funcionarios,
         administracao: {
             temAdm,
             nome: temAdm ? nomeAdm : '',
@@ -1355,6 +1494,14 @@ function textoSimNao(valor) {
     return valor === true ? 'Sim' : valor === false ? 'Não' : 'Não informado';
 }
 
+function textoFuncionarioFicha(dados, nome) {
+    const titulo = escaparHTML(nome);
+    if (!dados || typeof dados.tem !== 'boolean') return `<strong>${titulo}:</strong> Não informado`;
+    if (!dados.tem) return `<strong>${titulo}:</strong> Não`;
+    const nomes = Array.isArray(dados.nomes) ? dados.nomes.filter(Boolean).map(escaparHTML).join(', ') : '';
+    return `<strong>${titulo}:</strong> Sim · Quantidade: ${Number(dados.quantidade) || 0} · Nomes: ${nomes || 'Não informado'}`;
+}
+
 window.verCondominio = function(id) {
     const c = condominiosMemo.find(x => x._id === id);
     if (!c) return;
@@ -1368,13 +1515,17 @@ window.verCondominio = function(id) {
         s + (Number(t.totalApartamentos) || (Number(t.andares) || 0) * (Number(t.apartamentosPorAndar) || 0)), 0);
     const seg = c.portariaSeguranca || {};
     const adm = c.administracao || {};
+    const funcionarios = c.funcionarios || {};
 
     const detalhe = document.getElementById('condoDetailView');
 
     detalhe.innerHTML = `
         <div class="condo-detail-top">
             <h4>${escaparHTML(c.nome)}</h4>
-            <button class="condo-action-btn secondary" type="button" onclick="voltarListaCondominios()">← Voltar</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                <button class="condo-action-btn" type="button" onclick="baixarFichaCondominioPdf('${escaparHTML(c._id)}')">📄 Baixar PDF</button>
+                <button class="condo-action-btn secondary" type="button" onclick="voltarListaCondominios()">← Voltar</button>
+            </div>
         </div>
 
         <div class="condo-facts">
@@ -1393,6 +1544,9 @@ window.verCondominio = function(id) {
             ? `<div class="condo-notes"><strong>Zeladores:</strong><br>${c.nomesZeladores.map(escaparHTML).join('<br>')}</div>`
             : ''}
         ${adm.temAdm ? `<div class="condo-notes"><strong>ADM:</strong> ${escaparHTML(adm.nome || 'Nome não informado')}<br><strong>WhatsApp:</strong> ${escaparHTML(adm.whatsapp ? formatarTelefone(adm.whatsapp) : 'Não informado')}</div>` : ''}
+
+        <div class="sup-divider">Funcionários do condomínio</div>
+        <div class="condo-notes">${TIPOS_FUNCIONARIO.map(item => textoFuncionarioFicha(funcionarios[item.id], item.nome)).join('<br>')}</div>
 
         ${torres.length ? `<div class="sup-divider">Detalhes das torres</div>${torres.map((t, i) => `
             <div class="condo-notes"><strong>${escaparHTML(t.nome || `Torre ${i + 1}`)}</strong><br>
@@ -1428,6 +1582,169 @@ window.verCondominio = function(id) {
 
     document.getElementById('condoManagerView').style.display = 'none';
     detalhe.style.display = 'block';
+};
+
+window.baixarFichaCondominioPdf = function(id) {
+    const c = condominiosMemo.find(x => x._id === id);
+    if (!c) {
+        toast('Não encontrei a ficha deste condomínio.', 'error');
+        return;
+    }
+    const jsPDF = window.jspdf && window.jspdf.jsPDF;
+    if (!jsPDF) {
+        toast('Não foi possível carregar o gerador de PDF. Atualize a página e tente novamente.', 'error');
+        return;
+    }
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    const lineHeight = 5;
+    let y = 18;
+
+    const garantirEspaco = (altura = lineHeight) => {
+        if (y + altura > pageHeight - margin - 8) {
+            doc.addPage();
+            y = 18;
+        }
+    };
+
+    const escrever = (texto, tamanho = 10, negrito = false, depois = 0) => {
+        doc.setFont('helvetica', negrito ? 'bold' : 'normal');
+        doc.setFontSize(tamanho);
+        const valorTexto = texto === null || texto === undefined ? 'Não informado' : texto;
+        const linhas = doc.splitTextToSize(String(valorTexto), pageWidth - margin * 2);
+        linhas.forEach(linha => {
+            garantirEspaco(lineHeight);
+            doc.text(String(linha), margin, y);
+            y += lineHeight;
+        });
+        y += depois;
+    };
+
+    const campo = (rotulo, valor) => escrever(`${rotulo}: ${valor === null || valor === undefined ? 'Não informado' : valor}`);
+
+    const secao = titulo => {
+        y += 2;
+        garantirEspaco(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.text(titulo, margin, y);
+        y += 2;
+        doc.setDrawColor(203, 213, 225);
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 6;
+    };
+
+    const torres = Array.isArray(c.detalhesTorres) ? c.detalhesTorres : [];
+    const totalApartamentos = torres.reduce((total, torre) =>
+        total + (Number(torre.totalApartamentos) || (Number(torre.andares) || 0) * (Number(torre.apartamentosPorAndar) || 0)), 0);
+    const seguranca = c.portariaSeguranca || {};
+    const adm = c.administracao || {};
+    const funcionarios = c.funcionarios || {};
+    const extras = extrasDoCondominio(c).sort((a, b) => (b.dataE || '').localeCompare(a.dataE || ''));
+    const recebido = extras.filter(item => item.pago).reduce((total, item) => total + (Number(item.val) || 0), 0);
+    const pendente = extras.filter(item => !item.pago).reduce((total, item) => total + (Number(item.val) || 0), 0);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    escrever('Ficha do Condomínio', 17, true, 1);
+    escrever(c.nome || 'Condomínio sem nome', 14, true, 1);
+    escrever(`Gerada em ${new Date().toLocaleDateString('pt-BR')}`, 9, false, 2);
+
+    secao('Dados gerais');
+    campo('Torres', torres.length || c.torres || 0);
+    campo('Portarias', c.portarias === null || c.portarias === undefined ? 'Não informado' : c.portarias);
+    campo('Porteiros', c.porteiros === null || c.porteiros === undefined ? 'Não informado' : c.porteiros);
+    campo('Zeladores', c.zeladores === null || c.zeladores === undefined ? 0 : c.zeladores);
+    campo('Tem ADM?', textoSimNao(adm.temAdm));
+    campo('Apartamentos no total', totalApartamentos);
+    campo('Extras registradas', extras.length);
+    campo('Recebido', `R$ ${formatarMoeda(recebido)}`);
+    campo('Pendente', `R$ ${formatarMoeda(pendente)}`);
+
+    if (Array.isArray(c.nomesZeladores) && c.nomesZeladores.length) {
+        campo('Nomes dos zeladores', c.nomesZeladores.join(', '));
+    }
+    if (adm.temAdm) {
+        campo('ADM', adm.nome || 'Nome não informado');
+        campo('WhatsApp da ADM', adm.whatsapp ? formatarTelefone(adm.whatsapp) : 'Não informado');
+    }
+
+    secao('Funcionários do condomínio');
+    TIPOS_FUNCIONARIO.forEach(({ id, nome }) => {
+        const dadosFuncionario = funcionarios[id];
+        if (!dadosFuncionario || typeof dadosFuncionario.tem !== 'boolean') {
+            campo(nome, 'Não informado');
+        } else if (!dadosFuncionario.tem) {
+            campo(nome, 'Não');
+        } else {
+            campo(nome, `Sim · Quantidade: ${Number(dadosFuncionario.quantidade) || 0}`);
+            const nomes = Array.isArray(dadosFuncionario.nomes) ? dadosFuncionario.nomes.filter(Boolean).join(', ') : '';
+            campo(`Nomes - ${nome}`, nomes || 'Não informado');
+        }
+    });
+
+    secao('Detalhes das torres');
+    if (torres.length) {
+        torres.forEach((torre, indice) => {
+            escrever(torre.nome || `Torre ${indice + 1}`, 10, true);
+            campo('Andares', Number(torre.andares) || 0);
+            campo('Apartamentos por andar', Number(torre.apartamentosPorAndar) || 0);
+            escrever(`Total da torre: ${Number(torre.totalApartamentos) || 0}`, 10, false, 1);
+        });
+    } else {
+        escrever('Não informado');
+    }
+
+    secao('Portaria e segurança');
+    campo('Sistema Severino', textoSimNao(seguranca.severino));
+    campo('Protocolos', seguranca.protocolo || 'Não informado');
+    campo('Reconhecimento facial', textoSimNao(seguranca.reconhecimentoFacial));
+    campo('Abertura por placa', textoSimNao(seguranca.aberturaPorPlaca));
+    campo('Portaria virtual/remota', textoSimNao(seguranca.portariaVirtual));
+    campo('Portaria com funcionário', textoSimNao(seguranca.portariaHumana));
+
+    secao('Dias de limpeza');
+    escrever((c.diasLimpeza || []).length ? c.diasLimpeza.join(', ') : 'Não informado');
+
+    if (c.rotina) {
+        secao('Rotina');
+        escrever(c.rotina);
+    }
+    if (c.observacoes) {
+        secao('Observações');
+        escrever(c.observacoes);
+    }
+    if (Array.isArray(c.aliases) && c.aliases.length) {
+        secao('Outros nomes usados em registros antigos');
+        escrever(c.aliases.join(', '));
+    }
+
+    secao('Histórico de extras');
+    if (extras.length) {
+        extras.forEach(item => {
+            escrever(`${formatarData(item.dataE)} | ${item.fun || '-'} | ${item.sup || '-'} | R$ ${formatarMoeda(Number(item.val) || 0)} | ${item.pago ? 'PAGO' : 'PENDENTE'}`);
+        });
+    } else {
+        escrever('Ainda não há extras associadas a este condomínio.');
+    }
+
+    const totalPaginas = doc.internal.getNumberOfPages();
+    for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+        doc.setPage(pagina);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Ficha do condomínio - ${c.nome || ''}`, margin, pageHeight - 7);
+        doc.text(`Página ${pagina} de ${totalPaginas}`, pageWidth - margin, pageHeight - 7, { align: 'right' });
+    }
+
+    const nomeArquivo = `ficha_${c.nome || 'condominio'}`
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_+|_+$/g, '').toLowerCase();
+    doc.save(`${nomeArquivo || 'ficha_condominio'}.pdf`);
 };
 
 window.voltarListaCondominios = function() {
